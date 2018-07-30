@@ -115,7 +115,7 @@ class TyMeshLine extends THREE.Mesh {
 			fragmentShader: glslify('./glsl/line.frag'),
 
 			transparent: true,
-			// side: THREE.DoubleSide,
+			side: THREE.DoubleSide,
 			// wireframe: true,
 			depthWrite: false,
 			// blending: THREE.AdditiveBlending,

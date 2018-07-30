@@ -6,14 +6,18 @@ import VConsole from 'vconsole';
 import OrbitContructor from 'three-orbit-controls';
 
 
+
+import TyAudio from './TyAudio';
+
 import TyMeshLine from './TyMeshLine';
+
+import TyRecognizer from './TyRecognizer';
+
+
 
 const OrbitControls = OrbitContructor(THREE);
 const glslify = require('glslify');
-
-
-
-
+const Recognizer = new TyRecognizer();
 
 var That;
 var time = 0;
@@ -30,6 +34,28 @@ var orientationScale = {
 	value: 1
 };
 
+
+var colors = [
+	0x79b90a,
+	0xfae301,
+	0x00a4ad,
+	0x96cdad,
+	0xdd0165,
+	0x79418c,
+	0xf9f8c2,
+
+	0xec8681,
+	0xde535a
+];
+
+function Point(x, y) // constructor
+{
+	this.X = x;
+	this.Y = y;
+}
+
+
+
 class linesScene {
 
 	constructor() {
@@ -42,6 +68,8 @@ class linesScene {
 		this.container = document.getElementById('webglContainer');
 
 		this.start();
+
+		this.tyAudio = new TyAudio();
 	}
 
 	start() {
@@ -62,7 +90,7 @@ class linesScene {
 			antialias: true,
 			autoClearColor: true
 		});
-		this.renderer.setClearColor(0x000000);
+		this.renderer.setClearColor(0xffffff);
 		// this.renderer.setPixelRatio(window.devicePixelRatio);
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -97,7 +125,7 @@ class linesScene {
 			this.renderer.domElement.addEventListener("touchend", function(e) {
 				e.preventDefault();
 				if (e.stopPropagation) e.stopPropagation();
-				_isDown = false;
+				That.drawEnd();
 			}, false);
 
 			this.renderer.domElement.addEventListener("touchcancel", function(e) {
@@ -111,7 +139,7 @@ class linesScene {
 			this.renderer.domElement.addEventListener("mouseup", function(e) {
 				e.preventDefault();
 				if (e.stopPropagation) e.stopPropagation();
-				_isDown = false;
+				That.drawEnd();
 			}, false);
 
 			this.renderer.domElement.addEventListener("mousedown", function(e) {
@@ -133,12 +161,17 @@ class linesScene {
 		this.curPoints = [];
 		this.curLine = null;
 
-		this.linesObj =new THREE.Object3D();
+		this.linesObj = new THREE.Object3D();
 		this.scene.add(this.linesObj);
 
 
+
+		this.curPoints = [-215, 34.5, 0, -216, 34.5, 0, -218, 27.5, 0, -216, 17.5, 0, -209, 10.5, 0, -199, 3.5, 0, -187, -3.5, 0, -173, -9.5, 0, -152, -16.5, 0, -118, -26.5, 0, -73, -30.5, 0, -31, -31.5, 0, 15, -27.5, 0, 75, -6.5, 0, 103, 11.5, 0, 121, 31.5, 0, 133, 53.5, 0, 133, 73.5, 0, 123, 94.5, 0, 109, 110.5, 0, 84, 130.5, 0, 49, 146.5, 0, 20, 156.5, 0];
+		this.addLine();
+
 		time = Date.now();
 		this.animate();
+
 	}
 
 	onWindowResized() {
@@ -198,7 +231,7 @@ class linesScene {
 				dify = y - prevY;
 
 			var d = Math.sqrt(difx * difx + dify * dify);
-			if (d > 6) {
+			if (d > 10) {
 				// if (That.curPoints.length > maxPoints) {
 				// 	That.curPoints.shift();
 				// }
@@ -207,8 +240,6 @@ class linesScene {
 				prevX = x;
 				prevY = y;
 			}
-
-
 			That.addPoint();
 		}
 	}
@@ -222,7 +253,7 @@ class linesScene {
 
 		this.curLine = line;
 
-		line.uniforms.color.value = new THREE.Color(0xffffff * Math.random());
+		line.uniforms.color.value = new THREE.Color(colors[Math.floor(Math.random() * colors.length)]);
 
 		var texture = new THREE.TextureLoader().load('assets/stroke.png');
 		texture.wrapS = THREE.RepeatWrapping;
@@ -239,8 +270,27 @@ class linesScene {
 
 		// console.log(this.curLine);
 		// console.log(this.curPoints);
-
 		this.curLine.setPoints(this.curPoints);
+	}
+
+	drawEnd() {
+		_isDown = false;
+		console.log("drawEnd");
+		var line = [];
+		for (var i = 0; i < That.curPoints.length; i += 3) {
+			line.push(That.curPoints[i]);
+			line.push(That.curPoints[i + 1]);
+		}
+		// console.log(line);
+		var result = Recognizer.Recognize(line, true);
+
+		console.log(result);
+
+		if (result.Score > 1) {
+			console.log("paly " + result.Name);
+			That.tyAudio.play(result.Name);
+		}
+
 	}
 
 
@@ -257,6 +307,12 @@ class linesScene {
 	// main animation loop
 	render(dt) {
 		if (this.stats) this.stats.update();
+
+
+
+		this.lines.forEach(function(l, i) {
+			l.uniforms.lineWidth.value = 60 * (1 + .15 * Math.sin(.002 * time + i));
+		});
 
 
 		this.renderer.render(this.scene, this.camera);
