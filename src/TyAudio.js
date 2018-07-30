@@ -16,7 +16,7 @@ class TyAudio {
 
 		namesArr.forEach(function(n, i) {
 			let player = new Tone.Player({
-				"url": "./assets/audio/" + n + ".[mp3|ogg]",
+				"url": "./assets/audio/" + n + ".mp3",
 				"loop": false
 			}).toMaster();
 

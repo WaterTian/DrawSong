@@ -28,6 +28,9 @@ var prevX = 0;
 var prevY = 0;
 
 
+var firstTimeEver=true;
+
+
 var euler = new THREE.Euler();
 var q0 = new THREE.Quaternion();
 var orientationScale = {
@@ -79,10 +82,14 @@ class linesScene {
 		this.groundMaterial;
 		this.mesh;
 
-		this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 50000);
+		this.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 50000);
+		// this.camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 100000 );
 		this.camera.position.set(0, 0, 1000);
 		this.scene = new THREE.Scene();
 		this.scene.add(this.camera);
+
+		var helper = new THREE.CameraHelper( this.camera );
+		this.scene.add( helper );
 
 
 		// init renderer
@@ -166,7 +173,7 @@ class linesScene {
 
 
 
-		this.curPoints = [-215, 34.5, 0, -216, 34.5, 0, -218, 27.5, 0, -216, 17.5, 0, -209, 10.5, 0, -199, 3.5, 0, -187, -3.5, 0, -173, -9.5, 0, -152, -16.5, 0, -118, -26.5, 0, -73, -30.5, 0, -31, -31.5, 0, 15, -27.5, 0, 75, -6.5, 0, 103, 11.5, 0, 121, 31.5, 0, 133, 53.5, 0, 133, 73.5, 0, 123, 94.5, 0, 109, 110.5, 0, 84, 130.5, 0, 49, 146.5, 0, 20, 156.5, 0];
+		this.curPoints = [0,0,0,-window.innerWidth/2,0,0,-window.innerWidth/2,window.innerHeight/2,0,0,window.innerHeight/2,0,0,0,0];
 		this.addLine();
 
 		time = Date.now();
@@ -197,17 +204,17 @@ class linesScene {
 			euler.set((-gamma - Math.PI * 0.2) * 0.5 * orientationScale.value, beta * 0.4 * orientationScale.value, 0, 'YXZ');
 		}
 
-		q0.setFromEuler(euler);
-		if (That.linesObj) That.linesObj.quaternion.slerp(q0, 0.3);
+		// q0.setFromEuler(euler);
+		// if (That.linesObj) That.linesObj.quaternion.slerp(q0, 0.3);
 	}
 
 
 	down(e) {
-		// if (firstTimeEver) {
-		// 	points = [];
-		// 	lineWidth = 20;
-		// }
-		// 
+		if (firstTimeEver) {
+			That.tyAudio.play('a');
+
+			firstTimeEver=false;
+		}
 		That.curPoints = [];
 
 		var r = e.target.getClientRects()[0];
@@ -218,6 +225,8 @@ class linesScene {
 		That.curPoints.push(x - window.innerWidth / 2, window.innerHeight / 2 - y, 0);
 
 		That.addLine();
+
+		
 
 	}
 
