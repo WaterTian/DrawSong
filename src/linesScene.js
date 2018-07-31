@@ -19,16 +19,27 @@ const OrbitControls = OrbitContructor(THREE);
 const glslify = require('glslify');
 const Recognizer = new TyRecognizer();
 
+
+
+const isMobile = require('./isMobile.min.js');
+window.floatType = isMobile.any ? THREE.HalfFloatType : THREE.FloatType;
+
+
 var That;
 var time = 0;
 var zoom = 0;
+
+var cw = window.innerWidth;
+var ch = window.innerHeight;
+
 
 var _isDown = false;
 var prevX = 0;
 var prevY = 0;
 
+var lineWidth = 50;
 
-var firstTimeEver=true;
+var firstTimeEver = true;
 
 
 var euler = new THREE.Euler();
@@ -82,14 +93,30 @@ class linesScene {
 		this.groundMaterial;
 		this.mesh;
 
-		this.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 50000);
-		// this.camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 100000 );
-		this.camera.position.set(0, 0, 1000);
-		this.scene = new THREE.Scene();
-		this.scene.add(this.camera);
 
-		var helper = new THREE.CameraHelper( this.camera );
-		this.scene.add( helper );
+		this.scene = new THREE.Scene();
+
+		this.camera0 = new THREE.PerspectiveCamera(60, cw / ch, 1, 20000);
+		this.camera0.position.set(0, 0, 1000);
+		this.scene.add(this.camera0);
+
+
+		this.camera1 = new THREE.PerspectiveCamera(40.5, cw / ch, 1, 1000);
+		this.camera1.position.set(0, 0, 1000);
+		this.scene.add(this.camera1);
+		var helper1 = new THREE.CameraHelper(this.camera1);
+		// this.scene.add(helper1);
+
+
+		// this.camera2 = new THREE.OrthographicCamera( cw / - 2, cw / 2, ch / 2, ch / - 2, 1, 2000 );
+		// this.camera2.position.set(0, 0, 1000);
+		// this.scene.add(this.camera2);
+		// var helper2 = new THREE.CameraHelper(this.camera2);
+		// this.scene.add(helper2);
+
+
+
+		this.camera = this.camera1;
 
 
 		// init renderer
@@ -99,19 +126,24 @@ class linesScene {
 		});
 		this.renderer.setClearColor(0xffffff);
 		// this.renderer.setPixelRatio(window.devicePixelRatio);
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
+		this.renderer.setSize(cw, ch);
+
+		console.log(window.devicePixelRatio);
 
 		this.container.appendChild(this.renderer.domElement);
 
-		// this.renderer.gammaInput = true;
-		// this.renderer.gammaOutput = true;
+		this.renderer.gammaInput = true;
+		this.renderer.gammaOutput = true;
 
 
 		// // controls
 		// this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 		// this.controls.update();
-		// 
+
+
+
 		window.addEventListener('resize', this.onWindowResized);
+		this.onWindowResized();
 		if (window.DeviceOrientationEvent) window.addEventListener("deviceorientation", this.onOrientation);
 
 
@@ -142,7 +174,6 @@ class linesScene {
 			}, false);
 
 		} else {
-
 			this.renderer.domElement.addEventListener("mouseup", function(e) {
 				e.preventDefault();
 				if (e.stopPropagation) e.stopPropagation();
@@ -173,8 +204,10 @@ class linesScene {
 
 
 
-		this.curPoints = [0,0,0,-window.innerWidth/2,0,0,-window.innerWidth/2,window.innerHeight/2,0,0,window.innerHeight/2,0,0,0,0];
-		this.addLine();
+		// this.curPoints = [0, 0, 0, -cw / 2, 0, 0, -cw / 2, ch / 2, 0, 0, ch / 2, 0, 0, 0, 0];
+		// this.addLine();
+
+
 
 		time = Date.now();
 		this.animate();
@@ -182,12 +215,12 @@ class linesScene {
 	}
 
 	onWindowResized() {
-		var w = That.container.clientWidth;
-		var h = That.container.clientHeight;
+		cw = That.container.clientWidth;
+		ch = That.container.clientHeight;
 
-		That.renderer.setSize(w, h);
+		That.renderer.setSize(cw, ch);
 
-		That.camera.aspect = w / h;
+		That.camera.aspect = cw / ch;
 		That.camera.updateProjectionMatrix();
 
 		// var dPR = window.devicePixelRatio;
@@ -210,11 +243,11 @@ class linesScene {
 
 
 	down(e) {
-		if (firstTimeEver) {
-			That.tyAudio.play('a');
-
-			firstTimeEver=false;
+		if (firstTimeEver && isMobile.any) {
+			That.tyAudio.play('o');
+			firstTimeEver = false;
 		}
+
 		That.curPoints = [];
 
 		var r = e.target.getClientRects()[0];
@@ -222,11 +255,11 @@ class linesScene {
 		var y = e.offsetY || (e.clientY - (r.y || r.top));
 		_isDown = true;
 
-		That.curPoints.push(x - window.innerWidth / 2, window.innerHeight / 2 - y, 0);
+		That.curPoints.push(x - cw / 2, ch / 2 - y, 0);
 
 		That.addLine();
 
-		
+
 
 	}
 
@@ -245,7 +278,7 @@ class linesScene {
 				// 	That.curPoints.shift();
 				// }
 
-				That.curPoints.push(x - window.innerWidth / 2, window.innerHeight / 2 - y, 0);
+				That.curPoints.push(x - cw / 2, ch / 2 - y, 0);
 				prevX = x;
 				prevY = y;
 			}
@@ -270,7 +303,7 @@ class linesScene {
 
 		line.uniforms.useMap.value = 1;
 		line.uniforms.map.value = texture;
-		line.uniforms.lineWidth.value = 60;
+		line.uniforms.lineWidth.value = lineWidth;
 
 		// line.uniforms.repeat.value = new THREE.Vector2(1, 1);
 	}
@@ -297,7 +330,12 @@ class linesScene {
 
 		if (result.Score > 1) {
 			console.log("paly " + result.Name);
-			That.tyAudio.play(result.Name);
+			That.tyAudio.play(result.Name, That.curPoints[1] / ch);
+		}
+
+		if (That.lines.length > 15) {
+			That.linesObj.remove(That.lines[0]);
+			That.lines.shift();
 		}
 
 	}
@@ -320,8 +358,10 @@ class linesScene {
 
 
 		this.lines.forEach(function(l, i) {
-			l.uniforms.lineWidth.value = 60 * (1 + .15 * Math.sin(.002 * time + i));
+			l.uniforms.lineWidth.value = lineWidth * (1 + .15 * Math.sin(.002 * time + i));
 		});
+
+		if (this.tyAudio) this.tyAudio.update();
 
 
 		this.renderer.render(this.scene, this.camera);

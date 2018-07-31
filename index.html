@@ -13,6 +13,16 @@
                 margin: 0px;
                 overflow: hidden;
             }
+            .soundLine{
+                position: absolute;
+                z-index: 9;
+                /*right: 10px;*/
+                left: 50px;
+                bottom:0;
+                width: 128px;
+                height: 100px;
+                cursor: pointer;
+            }
 
             #webglContainer {
                 position: absolute;
@@ -26,6 +36,13 @@
         </style>
     </head>
     <body>
+        <div class="soundLine" >
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+              <path id="soundSVG" style="fill:none;stroke:#636363;stroke-width:1;"/>
+            </svg>
+        </div>
+
+
         <div id="webglContainer"></div>
         
         <script src="dist/app.js?v=0.0.1"></script>
