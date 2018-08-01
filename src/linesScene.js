@@ -34,10 +34,7 @@ var ch = window.innerHeight;
 
 
 var _isDown = false;
-var prevX = 0;
-var prevY = 0;
-
-var lineWidth = 50;
+var maxPoints = 128;
 
 var firstTimeEver = true;
 
@@ -50,16 +47,21 @@ var orientationScale = {
 
 
 var colors = [
-	0x79b90a,
-	0xfae301,
-	0x00a4ad,
-	0x96cdad,
-	0xdd0165,
-	0x79418c,
-	0xf9f8c2,
-
-	0xec8681,
-	0xde535a
+	0xed6a5a,
+	0xf4f1bb,
+	0x9bc1bc,
+	0x5ca4a9,
+	0xe6ebe0,
+	0xf0b67f,
+	0xfe5f55,
+	0xd6d1b1,
+	0xc7efcf,
+	0xeef5db,
+	0x50514f,
+	0xf25f5c,
+	0xffe066,
+	0x247ba0,
+	0x70c1b3
 ];
 
 function Point(x, y) // constructor
@@ -84,6 +86,35 @@ class linesScene {
 		this.start();
 
 		this.tyAudio = new TyAudio();
+
+		this.initUI();
+	}
+
+	initUI() {
+		let playBtn = document.getElementById('PlayBtn');
+		playBtn.addEventListener('touchmove', EventPreventDefault);
+		playBtn.addEventListener('mousemove', EventPreventDefault);
+
+
+		function EventPreventDefault(event) {
+			event.preventDefault();
+		}
+
+		playBtn.addEventListener('click', this.playMuisc);
+	}
+
+	playMuisc() {
+		console.log("playMuisc");
+
+		That.lines.forEach(function(l, i) {
+			if (l.order) {
+				console.log(l.order);
+				setTimeout(function() {
+					That.tyAudio.play(l.audioName, l.detune);
+					console.log(l.audioName);
+				}, l.order * 3000)
+			}
+		});
 	}
 
 	start() {
@@ -101,11 +132,11 @@ class linesScene {
 		this.scene.add(this.camera0);
 
 
-		this.camera1 = new THREE.PerspectiveCamera(40.5, cw / ch, 1, 1000);
+		this.camera1 = new THREE.PerspectiveCamera(40.5, cw / ch, 1, 1500);
 		this.camera1.position.set(0, 0, 1000);
 		this.scene.add(this.camera1);
 		var helper1 = new THREE.CameraHelper(this.camera1);
-		// this.scene.add(helper1);
+		this.scene.add(helper1);
 
 
 		// this.camera2 = new THREE.OrthographicCamera( cw / - 2, cw / 2, ch / 2, ch / - 2, 1, 2000 );
@@ -122,18 +153,26 @@ class linesScene {
 		// init renderer
 		this.renderer = new THREE.WebGLRenderer({
 			antialias: true,
-			autoClearColor: true
+			alpha: true
 		});
-		this.renderer.setClearColor(0xffffff);
-		// this.renderer.setPixelRatio(window.devicePixelRatio);
-		this.renderer.setSize(cw, ch);
 
 		console.log(window.devicePixelRatio);
+		this.renderer.setPixelRatio(window.devicePixelRatio);
+		this.renderer.setSize(cw, ch);
+		this.renderer.gammaInput = true;
+		this.renderer.gammaOutput = true;
 
 		this.container.appendChild(this.renderer.domElement);
 
-		this.renderer.gammaInput = true;
-		this.renderer.gammaOutput = true;
+
+		//
+		this.raycaster = new THREE.Raycaster();
+		this.raycasterPlane = new THREE.Mesh(new THREE.PlaneBufferGeometry(1000, 1000), new THREE.MeshNormalMaterial({
+			side: THREE.DoubleSide,
+			wireframe: true,
+		}));
+		// this.raycasterPlane.material.visible = false;
+		this.scene.add(this.raycasterPlane);
 
 
 		// // controls
@@ -154,41 +193,34 @@ class linesScene {
 				e = e.targetTouches[0];
 				That.down(e);
 			}, false);
-
 			this.renderer.domElement.addEventListener("touchmove", function(e) {
 				e.preventDefault();
 				if (e.stopPropagation) e.stopPropagation();
 				That.move(e.changedTouches[0]);
 			}, false);
-
 			this.renderer.domElement.addEventListener("touchend", function(e) {
 				e.preventDefault();
 				if (e.stopPropagation) e.stopPropagation();
 				That.drawEnd();
 			}, false);
-
 			this.renderer.domElement.addEventListener("touchcancel", function(e) {
 				e.preventDefault();
 				if (e.stopPropagation) e.stopPropagation();
 				_isDown = false;
 			}, false);
-
 		} else {
-			this.renderer.domElement.addEventListener("mouseup", function(e) {
+			document.addEventListener("mouseup", function(e) {
 				e.preventDefault();
 				if (e.stopPropagation) e.stopPropagation();
 				That.drawEnd();
 			}, false);
-
-			this.renderer.domElement.addEventListener("mousedown", function(e) {
+			document.addEventListener("mousedown", function(e) {
 				e.preventDefault();
 				if (e.stopPropagation) e.stopPropagation();
 				That.down(e);
 			}, false);
-
-			this.renderer.domElement.addEventListener("mousemove", function(e) {
+			document.addEventListener("mousemove", function(e) {
 				e.preventDefault();
-				if (e.stopPropagation) e.stopPropagation();
 				That.move(e);
 			}, false);
 		}
@@ -249,50 +281,43 @@ class linesScene {
 		}
 
 		That.curPoints = [];
-
-		var r = e.target.getClientRects()[0];
-		var x = e.offsetX || (e.clientX - (r.x || r.left));
-		var y = e.offsetY || (e.clientY - (r.y || r.top));
-		_isDown = true;
-
-		That.curPoints.push(x - cw / 2, ch / 2 - y, 0);
-
 		That.addLine();
 
-
-
+		_isDown = true;
 	}
 
 	move(e) {
 		if (_isDown) {
-			var r = e.target.getClientRects()[0];
-			var x = e.offsetX || (e.clientX - (r.x || r.left));
-			var y = e.offsetY || (e.clientY - (r.y || r.top));
+			var x = e.clientX / cw * 2 - 1;
+			var y = -e.clientY / ch * 2 + 1;
 
-			var difx = x - prevX,
-				dify = y - prevY;
+			// if (That.curPoints.length > maxPoints) {
+			// 	That.curPoints.shift();
+			// 	That.curPoints.shift();
+			// 	That.curPoints.shift();
+			// }
 
-			var d = Math.sqrt(difx * difx + dify * dify);
-			if (d > 10) {
-				// if (That.curPoints.length > maxPoints) {
-				// 	That.curPoints.shift();
-				// }
+			var mouse = new THREE.Vector2(x, y);
 
-				That.curPoints.push(x - cw / 2, ch / 2 - y, 0);
-				prevX = x;
-				prevY = y;
+			That.raycaster.setFromCamera(mouse, That.camera);
+
+			var intersects = That.raycaster.intersectObject(That.raycasterPlane);
+
+			if (intersects.length > 0) {
+				// console.log(intersects[0].point);
+				That.curPoints.push(intersects[0].point.x, intersects[0].point.y, 0);
+				That.addPoint();
 			}
-			That.addPoint();
+
 		}
 	}
 
 
 	addLine() {
 
-		let line = new TyMeshLine(That.curPoints);
+		let line = new TyMeshLine(60);
 		this.linesObj.add(line);
 		this.lines.push(line);
-
 		this.curLine = line;
 
 		line.uniforms.color.value = new THREE.Color(colors[Math.floor(Math.random() * colors.length)]);
@@ -303,7 +328,8 @@ class linesScene {
 
 		line.uniforms.useMap.value = 1;
 		line.uniforms.map.value = texture;
-		line.uniforms.lineWidth.value = lineWidth;
+		line.uniforms.sizeAttenuation.value = 1;
+
 
 		// line.uniforms.repeat.value = new THREE.Vector2(1, 1);
 	}
@@ -312,30 +338,45 @@ class linesScene {
 
 		// console.log(this.curLine);
 		// console.log(this.curPoints);
-		this.curLine.setPoints(this.curPoints);
+
+		this.curLine.setPoints(this.curPoints, "parabolic");
+
 	}
 
 	drawEnd() {
 		_isDown = false;
 		console.log("drawEnd");
-		var line = [];
-		for (var i = 0; i < That.curPoints.length; i += 3) {
-			line.push(That.curPoints[i]);
-			line.push(That.curPoints[i + 1]);
-		}
-		// console.log(line);
-		var result = Recognizer.Recognize(line, true);
 
+		if (That.curPoints.length == 0) return;
+
+
+		var linePs = [];
+		for (var i = 0; i < That.curPoints.length; i += 3) {
+			linePs.push(That.curPoints[i]);
+			linePs.push(That.curPoints[i + 1]);
+		}
+		// console.log(linePs);
+		var result = Recognizer.Recognize(linePs, true);
 		console.log(result);
 
 		if (result.Score > 1) {
+
+			That.curLine.audioName = result.Name;
+			That.curLine.detune = That.curPoints[1] / ch;
+			That.curLine.order = That.curPoints[0] / cw +0.5;
+
 			console.log("paly " + result.Name);
-			That.tyAudio.play(result.Name, That.curPoints[1] / ch);
+			That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
+
 		}
 
-		if (That.lines.length > 15) {
-			That.linesObj.remove(That.lines[0]);
-			That.lines.shift();
+		if (That.lines.length > 12) {
+
+			That.lines[0].removeThis(function() {
+				That.linesObj.remove(That.lines[0]);
+				That.lines.shift();
+			});
+
 		}
 
 	}
@@ -358,7 +399,7 @@ class linesScene {
 
 
 		this.lines.forEach(function(l, i) {
-			l.uniforms.lineWidth.value = lineWidth * (1 + .15 * Math.sin(.002 * time + i));
+			l.updateWidth(time);
 		});
 
 		if (this.tyAudio) this.tyAudio.update();

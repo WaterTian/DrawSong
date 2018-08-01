@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import TweenMax from "gsap";
+
 const glslify = require('glslify');
 
 
@@ -6,10 +8,15 @@ let That;
 class TyMeshLine extends THREE.Mesh {
 
 	///_type :none / linear / parabolic / wavy 
-	constructor(_points = [], _type = 'none') {
+	constructor( _width = 10) {
 		super();
 		That = this;
 
+		this.lineWidth = _width;
+		this.random = Math.random();
+		this.order = null; //播放顺序
+		this.detune = 0; //音高
+		this.audioName = null; //字母
 
 		this.positions = [];
 
@@ -22,29 +29,14 @@ class TyMeshLine extends THREE.Mesh {
 		this.counters = [];
 		this.geometry = new THREE.BufferGeometry();
 
-
-		if (_points instanceof Float32Array || _points instanceof Array) {
-			for (var j = 0; j < _points.length; j += 3) {
-				var c = j / _points.length;
-				this.positions.push(_points[j], _points[j + 1], _points[j + 2]);
-				this.positions.push(_points[j], _points[j + 1], _points[j + 2]);
-				this.counters.push(c);
-				this.counters.push(c);
-			}
-		} else {
-			console.log("input points with Float32Array or Array");
-		}
-
-		this.processGeometry(this.getTaperFunction(_type));
-
-
+		
 
 		//shader
 
 		this.uniforms = {
 			lineWidth: {
 				type: 'f',
-				value: 1
+				value: this.lineWidth
 			},
 			map: {
 				type: 't',
@@ -75,22 +67,6 @@ class TyMeshLine extends THREE.Mesh {
 				value: new THREE.Vector2(1, 1)
 			},
 			sizeAttenuation: {
-				type: 'f',
-				value: 1
-			},
-			dashArray: {
-				type: 'f',
-				value: 0
-			},
-			dashOffset: {
-				type: 'f',
-				value: 0
-			},
-			dashRatio: {
-				type: 'f',
-				value: 0.5
-			},
-			useDash: {
 				type: 'f',
 				value: 0
 			},
@@ -123,7 +99,7 @@ class TyMeshLine extends THREE.Mesh {
 	}
 
 
-	setPoints(_points = [], _type = 'none'){
+	setPoints(_points = [], _type = 'none') {
 
 		this.positions = [];
 		this.counters = [];
@@ -142,7 +118,24 @@ class TyMeshLine extends THREE.Mesh {
 		}
 
 		this.processGeometry(this.getTaperFunction(_type));
+	}
 
+	removeThis(callback) {
+
+		TweenMax.to(this.uniforms.visibility, .6, {
+			value: 0,
+			onComplete: function() {
+				callback();
+			}
+		});
+
+		TweenMax.to(this.position, .6, {
+			z: -300
+		});
+	}
+
+	updateWidth(_time) {
+		this.uniforms.lineWidth.value = this.lineWidth * (1 + .15 * Math.sin(.002 * _time + this.random*10));
 	}
 
 	processGeometry(_Taper) {
@@ -246,7 +239,7 @@ class TyMeshLine extends THREE.Mesh {
 				break;
 			case 'parabolic':
 				return function(p) {
-					return 1 * Maf.parabola(p, 1)
+					return 1 * That.parabola(p, 1)
 				};
 				break;
 			case 'wavy':
@@ -268,7 +261,9 @@ class TyMeshLine extends THREE.Mesh {
 		var aa = a * 6;
 		return [this.positions[aa], this.positions[aa + 1], this.positions[aa + 2]];
 	}
-
+	parabola(x, k) {
+		return Math.pow(4 * x * (1 - x), k);
+	}
 }
 
 export default TyMeshLine;

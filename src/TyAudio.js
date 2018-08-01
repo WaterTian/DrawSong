@@ -31,6 +31,7 @@ class TyAudio {
 
 
 		svgLine.addEventListener('touchmove', EventPreventDefault);
+		svgLine.addEventListener('mousemove', EventPreventDefault);
 		function EventPreventDefault(event) {
 			event.preventDefault();
 		}
@@ -45,7 +46,7 @@ class TyAudio {
 			this.players[num].detune = detune*3000;
 			this.players[num].start();
 
-			console.log(this.players[num].detune);
+			// console.log(this.players[num].detune);
 
 
 			setTimeout(()=>{
