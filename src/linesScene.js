@@ -275,7 +275,8 @@ class linesScene {
 
 
 	down(e) {
-		if (firstTimeEver && isMobile.any) {
+		if (firstTimeEver) {
+			console.log("play 0");
 			That.tyAudio.play('o');
 			firstTimeEver = false;
 		}
