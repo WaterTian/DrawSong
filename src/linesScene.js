@@ -62,6 +62,11 @@ var colors = [
 	0x95c531
 ];
 
+
+var isPlaying=false;
+var curPlayNum=0;
+
+
 function Point(x, y) // constructor
 {
 	this.X = x;
@@ -121,36 +126,36 @@ class linesScene {
 		this.camera = this.camera1;
 
 
-/*		this.scene.add(new THREE.AmbientLight(0xf0f0f0));
-		var light = new THREE.SpotLight(0xffffff, 1.5);
-		light.position.set(0, 1500, 200);
-		light.castShadow = true;
-		light.shadow = new THREE.LightShadow(new THREE.PerspectiveCamera(70, 1, 200, 2000));
-		light.shadow.bias = -0.000222;
-		light.shadow.mapSize.width = 1024;
-		light.shadow.mapSize.height = 1024;
-		this.scene.add(light);
+		/*		this.scene.add(new THREE.AmbientLight(0xf0f0f0));
+				var light = new THREE.SpotLight(0xffffff, 1.5);
+				light.position.set(0, 1500, 200);
+				light.castShadow = true;
+				light.shadow = new THREE.LightShadow(new THREE.PerspectiveCamera(70, 1, 200, 2000));
+				light.shadow.bias = -0.000222;
+				light.shadow.mapSize.width = 1024;
+				light.shadow.mapSize.height = 1024;
+				this.scene.add(light);
 
-		var planeGeometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
-		planeGeometry.rotateX( - Math.PI / 2 );
-		var planeMaterial = new THREE.ShadowMaterial( { opacity: 0.2 } );
-		var plane = new THREE.Mesh( planeGeometry, planeMaterial );
-		plane.position.y = -200;
-		plane.receiveShadow = true;
-		this.scene.add( plane );
+				var planeGeometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
+				planeGeometry.rotateX( - Math.PI / 2 );
+				var planeMaterial = new THREE.ShadowMaterial( { opacity: 0.2 } );
+				var plane = new THREE.Mesh( planeGeometry, planeMaterial );
+				plane.position.y = -200;
+				plane.receiveShadow = true;
+				this.scene.add( plane );
 
-		var helper = new THREE.GridHelper( 2000, 100 );
-		helper.position.y = - 199;
-		helper.material.opacity = 0.25;
-		helper.material.transparent = true;
-		this.scene.add( helper );
+				var helper = new THREE.GridHelper( 2000, 100 );
+				helper.position.y = - 199;
+				helper.material.opacity = 0.25;
+				helper.material.transparent = true;
+				this.scene.add( helper );
 
-		var geometry = new THREE.BoxGeometry( 100, 100, 100 );
-		var material = new THREE.MeshNormalMaterial();
-		var cube = new THREE.Mesh( geometry, material );
-		this.scene.add( cube );
-		cube.castShadow = true;
-*/
+				var geometry = new THREE.BoxGeometry( 100, 100, 100 );
+				var material = new THREE.MeshNormalMaterial();
+				var cube = new THREE.Mesh( geometry, material );
+				this.scene.add( cube );
+				cube.castShadow = true;
+		*/
 
 
 		// init renderer
@@ -372,6 +377,8 @@ class linesScene {
 		That.curLine.detune = Math.floor((That.curLine.center[1] / ch + 0.5) * 8);
 		That.curLine.order = Math.floor((That.curLine.center[0] / cw + 0.5) * 15) + 1;
 
+		console.log("order "+That.curLine.order);
+
 		if (result.Score > 10) {
 			That.curLine.audioName = result.Name;
 			console.log("paly " + result.Name);
@@ -438,23 +445,48 @@ class linesScene {
 			event.preventDefault();
 		}
 
-		playBtn.addEventListener('click', this.playMuisc);
+		playBtn.addEventListener('click', this.controlMuisc);
 	}
 
-	playMuisc() {
-		console.log("playMuisc");
+	controlMuisc() {
+
+		isPlaying = !isPlaying;
+		if(isPlaying){
+			console.log("playMuisc");
+
+			document.getElementById('play').style.display = "none";
+			document.getElementById('pause').style.display = "block";
+			That.musicLoop();
+		}else{
+			console.log("pauseMuisc");
+
+			document.getElementById('play').style.display = "block";
+			document.getElementById('pause').style.display = "none";
+		}
+
+	}
+
+	musicLoop() {
+		if(!isPlaying)return;
+
+		console.log("musicLoop " + curPlayNum);
 
 		That.lines.forEach(function(l, i) {
-			if (l.order) {
-				console.log(l.order);
-				setTimeout(function() {
-					if (l.audioName) That.tyAudio.play(l.audioName);
-					else That.tyAudio.playMarimba(l.detune);
 
-					l.shake();
-				}, l.order * 200)
+			if (l.order==curPlayNum) {
+				if (l.audioName) That.tyAudio.play(l.audioName);
+				else That.tyAudio.playMarimba(l.detune);
+				l.shake();
 			}
 		});
+
+
+        curPlayNum++;
+        if(curPlayNum>15)curPlayNum=0;
+		setTimeout(function(){
+			That.musicLoop();
+		}, 200);
+
 	}
 
 
