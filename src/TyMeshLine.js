@@ -8,7 +8,7 @@ let That;
 class TyMeshLine extends THREE.Mesh {
 
 	///_type :none / linear / parabolic / wavy 
-	constructor( _width = 10) {
+	constructor(_width = 10) {
 		super();
 		That = this;
 
@@ -29,7 +29,9 @@ class TyMeshLine extends THREE.Mesh {
 		this.counters = [];
 		this.geometry = new THREE.BufferGeometry();
 
-		
+		this.center = [];
+
+
 
 		//shader
 
@@ -85,6 +87,7 @@ class TyMeshLine extends THREE.Mesh {
 		}
 
 
+
 		this.material = new THREE.RawShaderMaterial({
 			uniforms: this.uniforms,
 			vertexShader: glslify('./glsl/line.vert'),
@@ -104,6 +107,7 @@ class TyMeshLine extends THREE.Mesh {
 		this.positions = [];
 		this.counters = [];
 
+		var minX, minY, maxX, maxY;
 
 		if (_points instanceof Float32Array || _points instanceof Array) {
 			for (var j = 0; j < _points.length; j += 3) {
@@ -112,30 +116,59 @@ class TyMeshLine extends THREE.Mesh {
 				this.positions.push(_points[j], _points[j + 1], _points[j + 2]);
 				this.counters.push(c);
 				this.counters.push(c);
+
+				//tyadd
+				if (j == 0) {
+					minX = maxX = _points[j];
+					minY = maxY = _points[j + 1];
+				} else {
+					if (_points[j] < minX) minX = _points[j];
+					if (_points[j + 1] < minY) minY = _points[j + 1];
+
+					if (_points[j] > maxX) maxX = _points[j];
+					if (_points[j + 1] > maxY) maxY = _points[j + 1];
+				}
 			}
+
+			var cx=minX+(maxX-minX)/2;
+			var cy=minY+(maxY-minY)/2;
+			this.center=[cx,cy];
+
 		} else {
 			console.log("input points with Float32Array or Array");
 		}
 
 		this.processGeometry(this.getTaperFunction(_type));
+
+
 	}
 
 	removeThis(callback) {
-
 		TweenMax.to(this.uniforms.visibility, .6, {
 			value: 0,
 			onComplete: function() {
 				callback();
 			}
 		});
-
 		TweenMax.to(this.position, .6, {
 			z: -300
 		});
 	}
 
+	shake() {
+		TweenMax.to(this.position, .6, {
+			z:60,
+			ease: Elastic.easeOut
+		});
+		TweenMax.to(this.position, 1.2, {
+			z: 0,
+			delay:.6,
+			ease: Linear.easeNone
+		});
+	}
+
 	updateWidth(_time) {
-		this.uniforms.lineWidth.value = this.lineWidth * (1 + .15 * Math.sin(.002 * _time + this.random*10));
+		this.uniforms.lineWidth.value = this.lineWidth * (1 + .15 * Math.sin(.002 * _time + this.random * 10));
 	}
 
 	processGeometry(_Taper) {
@@ -244,7 +277,7 @@ class TyMeshLine extends THREE.Mesh {
 				break;
 			case 'wavy':
 				return function(p) {
-					return 2 + Math.sin(50 * p)
+					return 2 + Math.sin(p)
 				};
 				break;
 		}

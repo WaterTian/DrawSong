@@ -47,7 +47,7 @@ void main() {
     float w = 1.8 * pixelWidth * lineWidth * width;
 
     if( sizeAttenuation == 1. ) {
-        w = 1.8 * lineWidth * width;
+        w = lineWidth * width;
     }
 
 

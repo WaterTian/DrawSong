@@ -16,7 +16,7 @@ varying float vCounters;
 void main() {
 
     vec4 c = vColor;
-    if( useMap == 1. ) c *= texture2D( map, vUV * repeat );
+    if( useMap == 1. ) c *= texture2D( map, vUV * repeat )*1.1; //tyadd 1.1
     if( useAlphaMap == 1. ) c.a *= texture2D( alphaMap, vUV * repeat ).a;
     if( c.a < alphaTest ) discard;
     
