@@ -20,7 +20,8 @@ class TyAudio {
 				"id": "MobileStart"
 			}).appendTo("body");
 			var button = $("<div>").attr("id", "Button").text("Enter").appendTo(element);
-			StartAudioContext(Tone.context, button, function() {
+
+			StartAudioContext(Tone.context, element, function() {
 				element.remove();
 			});
 		}
@@ -147,7 +148,7 @@ class TyAudio {
 		let linePath;
 		for (let i = 0; i < 68; i++) {
 
-			let _y = 130 + soundValue[i] * 50;
+			let _y = 140 + soundValue[i] * 50;
 			let _x = i + 34;
 			if (i == 0) linePath = "M " + _x + " " + _y;
 			linePath += "L" + _x + " ";

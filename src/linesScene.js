@@ -328,7 +328,7 @@ class linesScene {
 
 	addLine() {
 
-		let line = new TyMeshLine(60);
+		let line = new TyMeshLine(64);
 
 
 		this.linesObj.add(line);
@@ -369,10 +369,17 @@ class linesScene {
 
 		var linePs = [];
 		for (var i = 0; i < That.curPoints.length; i += 3) {
+			
+			// linePs.push(That.curPoints[i].toFixed(2));
+			// linePs.push(That.curPoints[i + 1].toFixed(2));
+			
 			linePs.push(That.curPoints[i]);
 			linePs.push(That.curPoints[i + 1]);
 		}
-		// console.log(linePs);
+
+		//.toFixed(2);
+		// console.log(linePs.toString());
+
 		var result = Recognizer.Recognize(linePs, true);
 		console.log(result);
 
@@ -381,7 +388,10 @@ class linesScene {
 
 		console.log("order " + That.curLine.order);
 
-		if (result.Score > 10) {
+
+		let useT = document.getElementById('useT').checked
+
+		if (result.Score > 3 && useT) {
 			That.curLine.audioName = result.Name;
 			console.log("paly " + result.Name);
 			That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
@@ -392,7 +402,7 @@ class linesScene {
 
 		That.curLine.shake();
 
-		if (That.lines.length > 26) {
+		if (That.lines.length > 21) {
 
 			That.lines[0].removeThis(function() {
 				That.linesObj.remove(That.lines[0]);
@@ -409,6 +419,7 @@ class linesScene {
 		requestAnimationFrame(this.animate.bind(this));
 		this.render(newTime - time);
 		time = newTime;
+
 
 	}
 
@@ -441,13 +452,38 @@ class linesScene {
 		let playBtn = document.getElementById('PlayBtn');
 		playBtn.addEventListener('touchmove', EventPreventDefault);
 		playBtn.addEventListener('mousemove', EventPreventDefault);
+		playBtn.addEventListener('click', this.controlMuisc);
+
+
+		let undoBtn = document.getElementById('UndoBtn');
+		undoBtn.addEventListener('touchmove', EventPreventDefault);
+		undoBtn.addEventListener('mousemove', EventPreventDefault);
+		undoBtn.addEventListener('click', this.clearMuisc);
+
 
 
 		function EventPreventDefault(event) {
 			event.preventDefault();
 		}
+	}
 
-		playBtn.addEventListener('click', this.controlMuisc);
+	clearMuisc() {
+
+		isPlaying = false
+		document.getElementById('play').style.display = "block";
+		document.getElementById('pause').style.display = "none";
+
+
+		That.lines.forEach(function(l) {
+			l.removeThis(function(_that) {
+				That.linesObj.remove(_that);
+			});
+		});
+		That.lines = [];
+		curPlayNum = 0;
+
+
+
 	}
 
 	controlMuisc() {

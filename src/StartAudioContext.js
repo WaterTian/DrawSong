@@ -39,6 +39,7 @@
 	 * drag move event
 	 */
 	TapListener.prototype._moved = function(e){
+		e.preventDefault();
 		this._dragged = true
 	};
 
