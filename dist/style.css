@@ -1,0 +1,141 @@
+    body {
+        font-family: "Inconsolata", monospace;
+        background-color: #ffffff;
+        margin: 0px;
+        overflow: hidden;
+    }
+
+    .soundLine {
+        position: absolute;
+        z-index: 9;
+        /*right: 10px;*/
+        left: 50px;
+        bottom: 0;
+        width: 128px;
+        height: 100px;
+        cursor: pointer;
+    }
+
+    #webglContainer {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+
+
+
+/*
+* 
+* PLAY BTN
+* 
+ */
+
+    .BtnContainer {
+        position: absolute;
+        width: 136px;
+        height: 136px;
+        background-size: 136px 136px;
+        right: 0px;
+        left: 0px;
+        bottom: 25px;
+        margin: auto;
+        /*transform: scale(.85);*/
+    }
+
+
+    .PlayBtn {
+        position: absolute;
+        width: 136px;
+        height: 136px;
+        background-size: 136px 136px;
+    }
+
+    .PlayBtn .pause {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-image: url(../assets/pause.png);
+        background-size: 45%;
+        background-repeat: no-repeat;
+        background-position: center center;
+        z-index: 2;
+        display: none;
+    }
+
+    .PlayBtn .play {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-image: url(../assets/play.png);
+        background-size: 40%;
+        background-repeat: no-repeat;
+        background-position: 53% 50%;
+        z-index: 2;
+    }
+
+    .PlayBtn.WobblyCircle {
+        position: absolute;
+        width: 136px;
+        height: 136px;
+        background-size: 136px 136px;
+    }
+
+    .PlayBtn .hit {
+        width: 100%;
+        height: 100%;
+        z-index: 99999;
+        top: 0px;
+        left: 0px;
+        position: absolute;
+        cursor: pointer;
+        border-radius: 1000px;
+    }
+
+
+
+/*
+*
+*  START MOBILE
+* 
+ */
+
+    #MobileStart {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 10000;
+        top: 0px;
+        left: 0px;
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    #MobileStart #Button {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        background-color: #7F33ED;
+        color: white;
+        border-radius: 12px;
+        margin-top: -30px;
+        margin-left: -60px;
+        width: 120px;
+        height: 60px;
+        font-size: 16px;
+        text-align: center;
+        line-height: 60px;
+    }
+
+    #MobileStart #Button:hover {
+        background-color: #7F33ED;
+        color: white;
+    }
+
+    #MobileStart #Button:hover:active {
+        background-color: #ED33CF;
+        color: #22DBC0;
+    }

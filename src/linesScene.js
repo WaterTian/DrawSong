@@ -21,8 +21,8 @@ const Recognizer = new TyRecognizer();
 
 
 
-const isMobile = require('./isMobile.min.js');
-window.floatType = isMobile.any ? THREE.HalfFloatType : THREE.FloatType;
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+window.floatType = isMobile ? THREE.HalfFloatType : THREE.FloatType;
 
 
 var That;
@@ -63,8 +63,8 @@ var colors = [
 ];
 
 
-var isPlaying=false;
-var curPlayNum=0;
+var isPlaying = false;
+var curPlayNum = 0;
 
 
 function Point(x, y) // constructor
@@ -91,6 +91,8 @@ class linesScene {
 		this.tyAudio = new TyAudio();
 
 		this.initUI();
+
+
 	}
 
 
@@ -326,7 +328,7 @@ class linesScene {
 
 	addLine() {
 
-		let line = new TyMeshLine(50);
+		let line = new TyMeshLine(60);
 
 
 		this.linesObj.add(line);
@@ -377,7 +379,7 @@ class linesScene {
 		That.curLine.detune = Math.floor((That.curLine.center[1] / ch + 0.5) * 8);
 		That.curLine.order = Math.floor((That.curLine.center[0] / cw + 0.5) * 15) + 1;
 
-		console.log("order "+That.curLine.order);
+		console.log("order " + That.curLine.order);
 
 		if (result.Score > 10) {
 			That.curLine.audioName = result.Name;
@@ -451,13 +453,13 @@ class linesScene {
 	controlMuisc() {
 
 		isPlaying = !isPlaying;
-		if(isPlaying){
+		if (isPlaying) {
 			console.log("playMuisc");
 
 			document.getElementById('play').style.display = "none";
 			document.getElementById('pause').style.display = "block";
 			That.musicLoop();
-		}else{
+		} else {
 			console.log("pauseMuisc");
 
 			document.getElementById('play').style.display = "block";
@@ -467,13 +469,13 @@ class linesScene {
 	}
 
 	musicLoop() {
-		if(!isPlaying)return;
+		if (!isPlaying) return;
 
 		console.log("musicLoop " + curPlayNum);
 
 		That.lines.forEach(function(l, i) {
 
-			if (l.order==curPlayNum) {
+			if (l.order == curPlayNum) {
 				if (l.audioName) That.tyAudio.play(l.audioName);
 				else That.tyAudio.playMarimba(l.detune);
 				l.shake();
@@ -481,9 +483,9 @@ class linesScene {
 		});
 
 
-        curPlayNum++;
-        if(curPlayNum>15)curPlayNum=0;
-		setTimeout(function(){
+		curPlayNum++;
+		if (curPlayNum > 15) curPlayNum = 0;
+		setTimeout(function() {
 			That.musicLoop();
 		}, 200);
 

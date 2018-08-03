@@ -7,60 +7,29 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <style>
-    body {
-        font-family: Monospace;
-        background-color: #ffffff;
-        margin: 0px;
-        overflow: hidden;
-    }
-
-    .soundLine {
-        position: absolute;
-        z-index: 9;
-        /*right: 10px;*/
-        left: 50px;
-        bottom: 0;
-        width: 128px;
-        height: 100px;
-        cursor: pointer;
-    }
-
-    #webglContainer {
-        position: absolute;
-        left: 0;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        width: 100%;
-        height: 100%;
-    }
-    </style>
+    <link rel="stylesheet" type="text/css" href="dist/style.css">
 </head>
 
 <body>
-    <div class="soundLine">
-        <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
-            <path id="soundSVG" style="fill:none;stroke:#636363;stroke-width:1;" />
-        </svg>
-    </div>
     <div id="webglContainer"></div>
-
     <div id="UI">
-        <div class="BtnContainer" style="position: absolute;width: 136.5px; height: 136.5px; background-size: 136.5px 136.5px; right: 0px; left: 0px; bottom: 25px; margin: auto; transform:scale(.85);">
-            <div class="PlayBtn" id="PlayBtn" style="position: absolute; width: 136.5px; height: 136.5px; background-size: 136.5px 136.5px;">
-                <div class="pause" id="pause" style="position: absolute; width: 100%; height: 100%; background-image: url(assets/pause.png); background-size: 50%; background-repeat: no-repeat; background-position: center center; z-index: 2; display: none;"></div>
-                <div class="play" id="play" style="position: absolute; width: 100%; height: 100%; background-image: url(assets/play.png); background-size: 40%; background-repeat: no-repeat; background-position: 53% 50%; z-index: 2;"></div>
-                <div class="WobblyCircle" style=" position: absolute; width: 136.5px; height: 136.5px; background-size: 136.5px 136.5px;  ">
-                    <svg id="Canvas" viewBox="0 0 136.5 136.5">
+        <div class="BtnContainer">
+            <div class="PlayBtn" id="PlayBtn">
+                <div class="pause" id="pause"></div>
+                <div class="play" id="play"></div>
+                <div class="WobblyCircle">
+                    <svg id="svgCanvas" viewBox="0 0 136 236">
                         <defs id="Defs"></defs>
-                        <path id="Path_1533108781672" fill="#4998b4" stroke="none" stroke-width="3" stroke-linejoin="round" d="M52.5 0 Q 51.35274904 10.91536377 49.65694278 16.13451876 Q 47.96113653 21.35367376 45.21726437 26.10619975 Q 42.47339220 30.85872575 38.80137452 34.93691454 Q 35.12935683 39.01510334 30.68967842 42.24071852 Q 26.25000000 45.46633370 21.23669610 47.69840040 Q 16.22339220 49.93046711 10.85556826 51.07143331 Q 5.48774432 52.21239951 -0.00000000 52.21239951 Q -5.48774432 52.21239951 -10.85556826 51.07143331 Q -16.22339220 49.93046711 -21.23669610 47.69840040 Q -26.25000000 45.46633370 -30.68967842 42.24071852 Q -35.12935683 39.01510334 -38.80137452 34.93691454 Q -42.47339220 30.85872575 -45.21726437 26.10619975 Q -47.96113653 21.35367376 -49.65694278 16.13451876 Q -51.35274904 10.91536377 -51.92637452 5.45768188 Q -52.50000000 0.00000000 -51.92637452 -5.45768188 Q -51.35274904 -10.91536377 -49.65694278 -16.13451876 Q -47.96113653 -21.35367376 -45.21726437 -26.10619975 Q -42.47339220 -30.85872575 -38.80137452 -34.93691454 Q -35.12935683 -39.01510334 -30.68967842 -42.24071852 Q -26.25000000 -45.46633370 -21.23669610 -47.69840040 Q -16.22339220 -49.93046711 -10.85556826 -51.07143331 Q -5.48774432 -52.21239951 -0.00000000 -52.21239951 Q 5.48774432 -52.21239951 10.85556826 -51.07143331 Q 16.22339220 -49.93046711 21.23669610 -47.69840040 Q 26.25000000 -45.46633370 30.68967842 -42.24071852 Q 35.12935683 -39.01510334 38.80137452 -34.93691454 Q 42.47339220 -30.85872575 45.21726437 -26.10619975 Q 47.96113653 -21.35367376 49.65694278 -16.13451876 Q 51.35274904 -10.91536377 52.50000000 0.00000000" style="transform: translate3d(68.25px, 68.25px, 0px);"></path>
+                        <path id="BtnPath" fill="#4998b4" stroke="none" stroke-width="3" stroke-linejoin="round"></path>
+                        <path id="SoundPath" fill="none" stroke="#4998b4" stroke-width="1" stroke-linejoin="round"></path>
+                        <path id="LinePath" fill="none" stroke="#9fb9c2" stroke-width="1"></path>
                     </svg>
                 </div>
-                <div class="hit" style="width: 100%; height: 100%; z-index: 99999; top: 0px; left: 0px; position: absolute; cursor: pointer; border-radius: 1000px;"></div>
+                <div class="hit"></div>
             </div>
         </div>
     </div>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
     <script src="dist/app.js?v=0.0.1"></script>
 </body>
 
