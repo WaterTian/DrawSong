@@ -80,9 +80,9 @@ class linesScene {
 	constructor() {
 		That = this;
 
-		this.vconsole = new VConsole();
-		this.stats = new Stats();
-		document.body.appendChild(this.stats.dom);
+		// this.vconsole = new VConsole();
+		// this.stats = new Stats();
+		// document.body.appendChild(this.stats.dom);
 
 		this.container = document.getElementById('webglContainer');
 
