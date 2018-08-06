@@ -391,9 +391,9 @@ class linesScene {
 
 		let useT = document.getElementById('useT').checked
 
-		if (result.Score > 3 && useT) {
+		if (result.Score > 1 && useT) {
 			That.curLine.audioName = result.Name;
-			console.log("paly " + result.Name);
+			console.log("paly " + result.Name + "_" + That.curLine.detune);
 			That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
 
 		} else {

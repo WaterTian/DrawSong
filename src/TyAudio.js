@@ -5,7 +5,8 @@ const StartAudioContext = require('./StartAudioContext.js');
 
 
 let That;
-const names = 'asdfghjklqwertyuiopzxcvbnm'
+// const names = 'asdfghjklqwertyuiopzxcvbnm';
+const names = 'abcde';
 
 class TyAudio {
 
@@ -32,22 +33,28 @@ class TyAudio {
 		this.players = [];
 		this.waveform = new Tone.Waveform(128);
 
-		namesArr.forEach(function(n, i) {
-			let player = new Tone.Player({
-				"url": "./assets/audio/" + n + ".mp3",
-				"loop": false,
-				// "grainSize" : 0.1,
-				// "overlap" : 0.05,
-			}).fan(That.waveform).toMaster();
+		namesArr.forEach(function(n) {
 
-			That.players.push(player);
+			let letter = [];
+			for (var i = 1; i <= 8; i++) {
+				let player = new Tone.Player({
+					"url": "./assets/audio/ty/" + n + i + ".mp3",
+					"loop": false,
+				}).fan(That.waveform).toMaster();
+
+				letter.push(player);
+			}
+
+			That.players.push(letter);
 		});
+
+		console.log(That.players);
 
 
 		this.marimbas = [];
-		for (var i = 0; i < 8; i++) {
+		for (var i = 1; i <= 8; i++) {
 			let player = new Tone.Player({
-				"url": "./assets/audio/marimba/tonal_marimba0" + i + ".mp3",
+				"url": "./assets/audio/ty/c" + i + ".mp3",
 				"loop": false,
 			}).fan(That.waveform).toMaster();
 
@@ -55,29 +62,22 @@ class TyAudio {
 		}
 
 
+
 		this.drawBtnWave();
 	}
 
-	play(name) {
+	play(name,detune=0) {
 		let num = names.indexOf(name);
 
 		if (num >= 0) {
-
-			// this.players[num].detune = detune*3000;
-			this.players[num].start();
-
-			// console.log(this.players[num].detune);
-
-
-			// setTimeout(()=>{
-			// 	That.players[num].stop();
-			// },1000);
+			this.players[num][detune].start();
+			console.log("paly " + num + "_" + detune);
 		}
 	}
 
-	playMarimba(num) {
-		console.log("playMarimba " + num);
-		this.marimbas[num].start();
+	playMarimba(detune) {
+		console.log("playMarimba " + detune);
+		this.marimbas[detune].start();
 	}
 
 
