@@ -389,9 +389,9 @@ class linesScene {
 		console.log("order " + That.curLine.order);
 
 
-		let useT = document.getElementById('useT').checked
+		let useT = !document.getElementById('useT').checked
 
-		if (result.Score > 1 && useT) {
+		if (result.Score > 2 && useT) {
 			That.curLine.audioName = result.Name;
 			console.log("paly " + result.Name + "_" + That.curLine.detune);
 			That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
@@ -512,7 +512,7 @@ class linesScene {
 		That.lines.forEach(function(l, i) {
 
 			if (l.order == curPlayNum) {
-				if (l.audioName) That.tyAudio.play(l.audioName);
+				if (l.audioName) That.tyAudio.play(l.audioName,l.detune);
 				else That.tyAudio.playMarimba(l.detune);
 				l.shake();
 			}

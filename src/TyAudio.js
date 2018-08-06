@@ -54,7 +54,8 @@ class TyAudio {
 		this.marimbas = [];
 		for (var i = 1; i <= 8; i++) {
 			let player = new Tone.Player({
-				"url": "./assets/audio/ty/c" + i + ".mp3",
+				"url": "./assets/audio/marimba/tonal_marimba0" + i + ".mp3",
+				// "url": "./assets/audio/ty/a" + i + ".mp3",
 				"loop": false,
 			}).fan(That.waveform).toMaster();
 
