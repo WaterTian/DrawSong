@@ -14,6 +14,8 @@ import TyMeshLine from './TyMeshLine';
 import TyRecognizer from './TyRecognizer';
 
 
+import introObject from './introObject';
+
 
 const OrbitControls = OrbitContructor(THREE);
 const glslify = require('glslify');
@@ -86,17 +88,14 @@ class linesScene {
 
 		this.container = document.getElementById('webglContainer');
 
-		this.start();
+		this.init();
 
 		this.tyAudio = new TyAudio();
 
-		this.initUI();
-
-
+		this.initIntro();
 	}
 
-
-	start() {
+	init() {
 
 		this.camera;
 		this.scene;
@@ -198,6 +197,77 @@ class linesScene {
 		if (window.DeviceOrientationEvent) window.addEventListener("deviceorientation", this.onOrientation);
 
 
+
+		time = Date.now();
+		this.animate();
+
+	}
+
+	onWindowResized() {
+		cw = That.container.clientWidth;
+		ch = That.container.clientHeight;
+
+		That.renderer.setSize(cw, ch);
+
+		That.camera.aspect = cw / ch;
+		That.camera.updateProjectionMatrix();
+
+		// var dPR = window.devicePixelRatio;
+		// if (this.effect) this.effect.uniforms['u_resolution'].value.set(w * dPR, h * dPR);
+	}
+	onOrientation(event) {
+		var alpha = event.alpha ? THREE.Math.degToRad(event.alpha) : 0; // Z
+		var beta = event.beta ? THREE.Math.degToRad(event.beta) : 0; // X'
+		var gamma = event.gamma ? THREE.Math.degToRad(event.gamma) : 0; // Y''
+		var orient = event.screenOrientation ? THREE.Math.degToRad(event.screenOrientation) : 0; // O
+
+
+		if (event.gamma < 0) {
+			euler.set((-gamma - Math.PI * 0.2) * 0.5 * orientationScale.value, beta * 0.4 * orientationScale.value, 0, 'YXZ');
+		}
+
+		// q0.setFromEuler(euler);
+		// if (That.linesObj) That.linesObj.quaternion.slerp(q0, 0.3);
+	}
+
+
+
+	/////////////////////////////init
+
+
+	initIntro() {
+
+		this.initLines();
+
+		this.intro = new introObject();
+		this.scene.add(this.intro);
+
+		this.intro.drawT(Recognizer.Unistrokes[0]);
+
+
+		
+		this.initUI();
+
+	}
+
+	initLines() {
+
+
+		this.lines = [];
+		this.curPoints = [];
+		this.curLine = null;
+
+		this.linesObj = new THREE.Object3D();
+		this.scene.add(this.linesObj);
+
+
+
+		// this.curPoints = [0, 0, 0, -cw / 2, 0, 0, -cw / 2, ch / 2, 0, 0, ch / 2, 0, 0, 0, 0];
+		// this.addLine();
+		// this.addPoint();
+
+
+
 		if (('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0)) {
 			this.renderer.domElement.addEventListener("touchstart", (e) => {
 				e.preventDefault();
@@ -236,54 +306,8 @@ class linesScene {
 				That.move(e);
 			}, false);
 		}
-
-
-
-		this.lines = [];
-		this.curPoints = [];
-		this.curLine = null;
-
-		this.linesObj = new THREE.Object3D();
-		this.scene.add(this.linesObj);
-
-
-
-		// this.curPoints = [0, 0, 0, -cw / 2, 0, 0, -cw / 2, ch / 2, 0, 0, ch / 2, 0, 0, 0, 0];
-		// this.addLine();
-
-
-
-		time = Date.now();
-		this.animate();
-
 	}
 
-	onWindowResized() {
-		cw = That.container.clientWidth;
-		ch = That.container.clientHeight;
-
-		That.renderer.setSize(cw, ch);
-
-		That.camera.aspect = cw / ch;
-		That.camera.updateProjectionMatrix();
-
-		// var dPR = window.devicePixelRatio;
-		// if (this.effect) this.effect.uniforms['u_resolution'].value.set(w * dPR, h * dPR);
-	}
-	onOrientation(event) {
-		var alpha = event.alpha ? THREE.Math.degToRad(event.alpha) : 0; // Z
-		var beta = event.beta ? THREE.Math.degToRad(event.beta) : 0; // X'
-		var gamma = event.gamma ? THREE.Math.degToRad(event.gamma) : 0; // Y''
-		var orient = event.screenOrientation ? THREE.Math.degToRad(event.screenOrientation) : 0; // O
-
-
-		if (event.gamma < 0) {
-			euler.set((-gamma - Math.PI * 0.2) * 0.5 * orientationScale.value, beta * 0.4 * orientationScale.value, 0, 'YXZ');
-		}
-
-		// q0.setFromEuler(euler);
-		// if (That.linesObj) That.linesObj.quaternion.slerp(q0, 0.3);
-	}
 
 
 	down(e) {
@@ -319,7 +343,7 @@ class linesScene {
 			if (intersects.length > 0) {
 				// console.log(intersects[0].point);
 				That.curPoints.push(intersects[0].point.x, intersects[0].point.y, 0);
-				That.addPoint();
+				That.addPoint(That.curPoints);
 			}
 
 		}
@@ -331,9 +355,9 @@ class linesScene {
 		let line = new TyMeshLine(64);
 
 
-		this.linesObj.add(line);
-		this.lines.push(line);
-		this.curLine = line;
+		That.linesObj.add(line);
+		That.lines.push(line);
+		That.curLine = line;
 
 		line.uniforms.color.value = new THREE.Color(colors[Math.floor(Math.random() * colors.length)]);
 
@@ -351,12 +375,12 @@ class linesScene {
 		// line.uniforms.repeat.value = new THREE.Vector2(1, 1);
 	}
 
-	addPoint() {
+	addPoint(_curPoints) {
 
 		// console.log(this.curLine);
-		// console.log(this.curPoints);
+		// console.log(_curPoints);
 
-		this.curLine.setPoints(this.curPoints, "parabolic");
+		That.curLine.setPoints(_curPoints, "parabolic");
 
 	}
 
@@ -369,16 +393,16 @@ class linesScene {
 
 		var linePs = [];
 		for (var i = 0; i < That.curPoints.length; i += 3) {
-			
-			// linePs.push(That.curPoints[i].toFixed(2));
-			// linePs.push(That.curPoints[i + 1].toFixed(2));
-			
-			linePs.push(That.curPoints[i]);
-			linePs.push(That.curPoints[i + 1]);
+
+			linePs.push(That.curPoints[i].toFixed(2));
+			linePs.push(That.curPoints[i + 1].toFixed(2));
+
+			// linePs.push(That.curPoints[i]);
+			// linePs.push(That.curPoints[i + 1]);
 		}
 
 		//.toFixed(2);
-		// console.log(linePs.toString());
+		console.log(linePs.toString());
 
 		var result = Recognizer.Recognize(linePs, true);
 		console.log(result);
@@ -428,12 +452,13 @@ class linesScene {
 	render(dt) {
 		if (this.stats) this.stats.update();
 
-		// this.linesObj.rotation.y+=0.01;
-		// this.raycasterPlane.rotation.y+=0.01;
 
-		this.lines.forEach(function(l, i) {
-			l.updateWidth(time);
-		});
+		if (this.lines) {
+			this.lines.forEach(function(l, i) {
+				l.updateWidth(time);
+			});
+		}
+
 
 		if (this.tyAudio) this.tyAudio.update();
 
@@ -512,7 +537,7 @@ class linesScene {
 		That.lines.forEach(function(l, i) {
 
 			if (l.order == curPlayNum) {
-				if (l.audioName) That.tyAudio.play(l.audioName,l.detune);
+				if (l.audioName) That.tyAudio.play(l.audioName, l.detune);
 				else That.tyAudio.playMarimba(l.detune);
 				l.shake();
 			}

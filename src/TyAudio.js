@@ -48,7 +48,7 @@ class TyAudio {
 			That.players.push(letter);
 		});
 
-		console.log(That.players);
+		// console.log(That.players);
 
 
 		this.marimbas = [];
