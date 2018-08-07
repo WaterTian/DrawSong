@@ -69,6 +69,9 @@ var isPlaying = false;
 var curPlayNum = 0;
 
 
+var isIntro = true;
+
+
 function Point(x, y) // constructor
 {
 	this.X = x;
@@ -237,18 +240,60 @@ class linesScene {
 
 	initIntro() {
 
+		isIntro = true;
+
 		this.initLines();
 
 		this.intro = new introObject();
 		this.scene.add(this.intro);
 
-		this.intro.drawT(Recognizer.Unistrokes[0]);
+		this.introT = '';
 
-
-		
-		this.initUI();
-
+		this.initIntroA();
 	}
+
+	initIntroA() {
+		That.clearMuisc();
+		let _ps = Recognizer.Unistrokes[0];
+		let _nt = 'a';
+
+		That.intro.drawT(_ps, function() {
+			That.tyAudio.play(_nt, 2);
+			That.introT = 'a';
+		});
+	}
+	initIntroB() {
+		That.clearMuisc();
+		let _ps = Recognizer.Unistrokes[2];
+		let _nt = 'b';
+
+		That.intro.clearT(function() {
+			That.intro.drawT(_ps, function() {
+				That.tyAudio.play(_nt, 2);
+				That.introT = 'b';
+			});
+		});
+	}
+	initIntroC() {
+		That.clearMuisc();
+		let _ps = Recognizer.Unistrokes[4];
+		let _nt = 'c';
+
+		That.intro.clearT(function() {
+			That.intro.drawT(_ps, function() {
+				That.tyAudio.play(_nt, 2);
+				That.introT = 'c';
+			});
+		});
+	}
+	removeIntro() {
+		That.clearMuisc();
+		That.intro.clearT();
+		isIntro = false;
+
+		That.initUI();
+	}
+
 
 	initLines() {
 
@@ -394,15 +439,15 @@ class linesScene {
 		var linePs = [];
 		for (var i = 0; i < That.curPoints.length; i += 3) {
 
-			linePs.push(That.curPoints[i].toFixed(2));
-			linePs.push(That.curPoints[i + 1].toFixed(2));
+			// linePs.push(That.curPoints[i].toFixed(2));
+			// linePs.push(That.curPoints[i + 1].toFixed(2));
 
-			// linePs.push(That.curPoints[i]);
-			// linePs.push(That.curPoints[i + 1]);
+			linePs.push(That.curPoints[i]);
+			linePs.push(That.curPoints[i + 1]);
 		}
 
 		//.toFixed(2);
-		console.log(linePs.toString());
+		// console.log(linePs.toString());
 
 		var result = Recognizer.Recognize(linePs, true);
 		console.log(result);
@@ -419,6 +464,14 @@ class linesScene {
 			That.curLine.audioName = result.Name;
 			console.log("paly " + result.Name + "_" + That.curLine.detune);
 			That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
+
+			////
+			if (isIntro) {
+				if (That.introT == 'a' && result.Name == 'a') setTimeout(That.initIntroB, 600);
+				if (That.introT == 'b' && result.Name == 'b') setTimeout(That.initIntroC, 600);
+				if (That.introT == 'c' && result.Name == 'c') setTimeout(That.removeIntro, 600);
+
+			}
 
 		} else {
 			That.tyAudio.playMarimba(That.curLine.detune);
@@ -474,6 +527,11 @@ class linesScene {
 
 
 	initUI() {
+
+		document.getElementById('BtnContainer').style.display = "block";
+
+
+
 		let playBtn = document.getElementById('PlayBtn');
 		playBtn.addEventListener('touchmove', EventPreventDefault);
 		playBtn.addEventListener('mousemove', EventPreventDefault);

@@ -41,6 +41,7 @@
         bottom: 30px;
         margin: auto;
         /*transform: scale(.85);*/
+        display: none;
     }
 
 

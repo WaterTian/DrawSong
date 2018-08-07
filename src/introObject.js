@@ -32,7 +32,7 @@ class introObject extends THREE.Object3D {
 
 
 		this.hand = new THREE.Mesh(
-			new THREE.PlaneBufferGeometry(50, 50),
+			new THREE.PlaneBufferGeometry(60, 60),
 			new THREE.RawShaderMaterial({
 				uniforms: {
 					map: {
@@ -59,13 +59,13 @@ class introObject extends THREE.Object3D {
 	}
 
 	moveHand(_x, _y) {
-		That.hand.position.x = _x+5;
-		That.hand.position.y = _y-20;
+		That.hand.position.x = _x + 5;
+		That.hand.position.y = _y - 20;
 
 	}
 
 
-	drawT(_ps) {
+	drawT(_ps, callback) {
 
 		let curPoints = [];
 		let _num = 0;
@@ -81,12 +81,30 @@ class introObject extends THREE.Object3D {
 		line.uniforms.map.value = texture;
 		line.uniforms.sizeAttenuation.value = 1;
 
+		this.curLine = line;
+
+
+
+		TweenMax.to(That.hand.material.uniforms.opacity, .6, {
+			value: 1,
+			ease: Strong.easeOut
+		});
 
 
 		draw();
 
 		function draw() {
-			if (_num >= _ps._Points.length) return;
+			if (_num >= _ps._Points.length) {
+
+				callback();
+				line.shake();
+
+				TweenMax.to(That.hand.material.uniforms.opacity, .6, {
+					value: 0,
+					ease: Strong.easeOut
+				});
+				return;
+			}
 
 			let _x = _ps._Points[_num];
 			let _y = _ps._Points[_num + 1];
@@ -100,7 +118,16 @@ class introObject extends THREE.Object3D {
 			_num += 2;
 			setTimeout(draw, 30);
 		}
+	}
 
+	clearT(callback) {
+
+		if(!That.curLine)return;
+
+		That.curLine.removeThis(function(_that) {
+			That.remove(_that);
+			if(callback)callback();
+		});
 	}
 
 
