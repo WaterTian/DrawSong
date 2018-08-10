@@ -83,6 +83,10 @@ class TyMeshLine extends THREE.Mesh {
 			repeat: {
 				type: 'v2',
 				value: new THREE.Vector2(1, 1)
+			},
+			colorAdd: {
+				type: 'f',
+				value: 1.1
 			}
 		}
 
@@ -156,15 +160,25 @@ class TyMeshLine extends THREE.Mesh {
 	}
 
 	shake() {
-		TweenMax.to(this.position, .6, {
-			z:60,
+		TweenMax.to(this.position, .5, {
+			z:50,
 			ease: Elastic.easeOut
 		});
-		TweenMax.to(this.position, 1.2, {
+		TweenMax.to(this.position, 1, {
 			z: 0,
 			delay:.6,
 			ease: Linear.easeNone
 		});
+
+		TweenMax.to(this.uniforms.colorAdd, .5, {
+			value: 1.36,
+			ease: Elastic.easeOut
+		});
+		TweenMax.to(this.uniforms.colorAdd, .5, {
+			value: 1.1,
+			delay:.5,
+		});
+
 	}
 
 	updateWidth(_time) {

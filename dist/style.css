@@ -143,32 +143,33 @@
  */
 
     .chooseBtn {
-        position: absolute;
         display: none;
     }
 
     .choose-label {
         position: absolute;
+        top: 85px;
+        left: -50px;
         box-shadow: #fff 0px 0px 0px 1px;
-        top: 82px;
-        left: -40px;
         width: 40px;
         height: 20px;
         display: inline-block;
+
         border-radius: 20px;
         position: relative;
-        background-color: #bdbdbd;
+        background-color: #cdcdcd;
         overflow: hidden;
     }
 
     .choose-label:before {
         content: '';
         position: absolute;
-        left: 0;
-        width: 20px;
-        height: 20px;
+        top: 1px;
+        left: 1px;
+        width: 18px;
+        height: 18px;
         display: inline-block;
-        border-radius: 20px;
+        border-radius: 18px;
         background-color: #fff;
         z-index: 20;
         -webkit-transition: all 0.5s;
@@ -176,7 +177,7 @@
     }
 
     .chooseBtn:checked+label.choose-label:before {
-        left: 20px;
+        left: 21px;
     }
 
     .chooseBtn:checked+label.choose-label {
@@ -196,6 +197,8 @@
         top: 0px;
         left: 0px;
         background-color: rgba(0, 0, 0, 0.8);
+
+        /*display: none;*/
     }
 
     #MobileStart #Button {
@@ -222,4 +225,49 @@
     #MobileStart #Button:hover:active {
         background-color: #ED33CF;
         color: #22DBC0;
+    }
+
+
+
+    /* RADIO */
+    .el-radio{
+        position: absolute;
+        top: 30%;
+        left: 50%;
+    }
+
+    .margin-t{
+        margin-left:5px;
+        vertical-align: top;
+        color: #fff;
+        font-size: 20px;
+    }
+
+    .regular-radio {
+        display: none;
+    }
+
+    .regular-radio+label {
+        position: relative;
+        -webkit-appearance: none;
+        background-color: #fff;
+        border: 1px solid #4998b4;
+        padding: 9px;
+        border-radius: 50px;
+        display: inline-block;
+        margin-left:-36px;
+
+    }
+
+
+    .regular-radio:checked+label:after {
+        content: ' ';
+        width: 12px;
+        height: 12px;
+        border-radius: 50px;
+        position: absolute;
+        top: 3px;
+        background: #4998b4;
+        box-shadow: 0px 0px 5px 0px #4998b4;
+        left: 3px;
     }

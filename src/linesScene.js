@@ -4,7 +4,7 @@ import Stats from 'stats.js';
 import dat from 'dat-gui';
 import VConsole from 'vconsole';
 import OrbitContructor from 'three-orbit-controls';
-
+import Tone from 'Tone';
 
 
 import TyAudio from './TyAudio';
@@ -22,9 +22,13 @@ const glslify = require('glslify');
 const Recognizer = new TyRecognizer();
 
 
+const StartAudioContext = require('./StartAudioContext.js');
+
+
 
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 window.floatType = isMobile ? THREE.HalfFloatType : THREE.FloatType;
+
 
 
 var That;
@@ -37,6 +41,9 @@ var ch = window.innerHeight;
 
 var _isDown = false;
 var maxPoints = 256;
+
+var maxLinesNum = isMobile ? 21 : 24;
+
 
 var firstTimeEver = true;
 
@@ -93,9 +100,29 @@ class linesScene {
 
 		this.init();
 
+
+		//mobile start
+		if (isMobile) {
+			var element = $("<div>", {
+				"id": "MobileStart"
+			}).appendTo("body");
+			var button = $("<div>").attr("id", "Button").text("Enter").appendTo(element);
+			
+			StartAudioContext(Tone.context, element, function() {
+				element.remove();
+				setTimeout(That.initIntro, 1000);
+			});
+		} else {
+
+			setTimeout(That.initIntro, 1000);
+		}
+
+
 		this.tyAudio = new TyAudio();
 
-		this.initIntro();
+		// That.initUI();
+
+
 	}
 
 	init() {
@@ -197,7 +224,7 @@ class linesScene {
 
 		window.addEventListener('resize', this.onWindowResized);
 		this.onWindowResized();
-		if (window.DeviceOrientationEvent) window.addEventListener("deviceorientation", this.onOrientation);
+		// if (window.DeviceOrientationEvent) window.addEventListener("deviceorientation", this.onOrientation);
 
 
 
@@ -242,14 +269,14 @@ class linesScene {
 
 		isIntro = true;
 
-		this.initLines();
+		That.initLines();
 
-		this.intro = new introObject();
-		this.scene.add(this.intro);
+		That.intro = new introObject();
+		That.scene.add(That.intro);
 
-		this.introT = '';
+		That.introT = '';
 
-		this.initIntroA();
+		That.initIntroA();
 	}
 
 	initIntroA() {
@@ -287,9 +314,12 @@ class linesScene {
 		});
 	}
 	removeIntro() {
-		That.clearMuisc();
-		That.intro.clearT();
 		isIntro = false;
+		That.clearMuisc();
+		That.intro.clearT(function() {
+			That.intro.removeThis();
+		});
+
 
 		That.initUI();
 	}
@@ -429,6 +459,11 @@ class linesScene {
 
 	}
 
+
+	//////////////////////
+	///
+	///
+	///
 	drawEnd() {
 		_isDown = false;
 		console.log("drawEnd");
@@ -452,34 +487,56 @@ class linesScene {
 		var result = Recognizer.Recognize(linePs, true);
 		console.log(result);
 
-		That.curLine.detune = Math.floor((That.curLine.center[1] / ch + 0.5) * 8);
-		That.curLine.order = Math.floor((That.curLine.center[0] / cw + 0.5) * 15) + 1;
+		That.curLine.detune = Math.floor((That.curLine.center[1] / ch + 0.5) * 10);
+		That.curLine.order = Math.floor((That.curLine.center[0] / cw + 0.5) * 14);
 
+		if (That.curLine.detune < 1) That.curLine.detune = 1;
+		if (That.curLine.detune > 8) That.curLine.detune = 8;
+		That.curLine.detune--;
+
+		if (That.curLine.order < 1) That.curLine.order = 1;
+		if (That.curLine.order > 12) That.curLine.order = 12;
+		That.curLine.order--;
+
+		// console.log("detune " + That.curLine.detune);
 		console.log("order " + That.curLine.order);
 
 
 		let useT = !document.getElementById('useT').checked
 
-		if (result.Score > 2 && useT) {
-			That.curLine.audioName = result.Name;
-			console.log("paly " + result.Name + "_" + That.curLine.detune);
-			That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
+		if (useT) {
+			if (result.Score > 2) {
+				That.curLine.audioName = result.Name;
+				console.log("paly " + result.Name + "_" + That.curLine.detune);
+				That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
 
-			////
-			if (isIntro) {
-				if (That.introT == 'a' && result.Name == 'a') setTimeout(That.initIntroB, 600);
-				if (That.introT == 'b' && result.Name == 'b') setTimeout(That.initIntroC, 600);
-				if (That.introT == 'c' && result.Name == 'c') setTimeout(That.removeIntro, 600);
+				////
+				if (isIntro) {
+					if (That.introT == 'a' && result.Name == 'a') {
+						That.intro.fw.open();
+						setTimeout(That.initIntroB, 1200);
+					}
+					if (That.introT == 'b' && result.Name == 'b') {
+						That.intro.fw.open();
+						setTimeout(That.initIntroC, 1200);
+					}
+					if (That.introT == 'c' && result.Name == 'c') {
+						That.intro.fw.open();
+						setTimeout(That.removeIntro, 1200);
+					}
 
+				}
+
+			} else {
+				That.tyAudio.playBase(That.curLine.detune);
 			}
-
-		} else {
+		}else{
 			That.tyAudio.playMarimba(That.curLine.detune);
 		}
 
 		That.curLine.shake();
 
-		if (That.lines.length > 21) {
+		if (That.lines.length > maxLinesNum) {
 
 			That.lines[0].removeThis(function() {
 				That.linesObj.remove(That.lines[0]);
@@ -513,6 +570,7 @@ class linesScene {
 		}
 
 
+		if (this.intro) this.intro.update(dt);
 		if (this.tyAudio) this.tyAudio.update();
 
 
@@ -528,7 +586,13 @@ class linesScene {
 
 	initUI() {
 
-		document.getElementById('BtnContainer').style.display = "block";
+		let BtnContainer = document.getElementById('BtnContainer');
+		BtnContainer.style.display = "block";
+		TweenMax.from(BtnContainer, .8, {
+			opacity: 0,
+			scale: 0.1,
+			ease: Back.easeOut,
+		});
 
 
 
@@ -592,18 +656,26 @@ class linesScene {
 
 		console.log("musicLoop " + curPlayNum);
 
+		let useT = !document.getElementById('useT').checked
+
 		That.lines.forEach(function(l, i) {
 
 			if (l.order == curPlayNum) {
-				if (l.audioName) That.tyAudio.play(l.audioName, l.detune);
-				else That.tyAudio.playMarimba(l.detune);
+
+				if(useT){
+					if (l.audioName) That.tyAudio.play(l.audioName, l.detune);
+					else That.tyAudio.playBase(l.detune);
+				}else{
+					That.tyAudio.playMarimba(l.detune);
+				} 
+
 				l.shake();
 			}
 		});
 
 
 		curPlayNum++;
-		if (curPlayNum > 15) curPlayNum = 0;
+		if (curPlayNum > 11) curPlayNum = 0;
 		setTimeout(function() {
 			That.musicLoop();
 		}, 200);

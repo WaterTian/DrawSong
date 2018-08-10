@@ -1,32 +1,15 @@
 import Tone from 'Tone';
 
 
-const StartAudioContext = require('./StartAudioContext.js');
-
 
 let That;
 // const names = 'asdfghjklqwertyuiopzxcvbnm';
-const names = 'abcde';
+const names = 'abcd';
 
 class TyAudio {
 
 	constructor() {
 		That = this;
-
-
-		//mobile start
-		if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-			$("body").addClass("Mobile");
-			var element = $("<div>", {
-				"id": "MobileStart"
-			}).appendTo("body");
-			var button = $("<div>").attr("id", "Button").text("Enter").appendTo(element);
-
-			StartAudioContext(Tone.context, element, function() {
-				element.remove();
-			});
-		}
-
 
 
 		let namesArr = names.split("");
@@ -63,17 +46,32 @@ class TyAudio {
 		}
 
 
+		this.bases = [];
+		for (var i = 1; i <= 3; i++) {
+			let player = new Tone.Player({
+				"url": "./assets/audio/base/" + i + ".mp3",
+				"loop": false,
+			}).fan(That.waveform).toMaster();
+			That.bases.push(player);
+		}
+
 
 		this.drawBtnWave();
 	}
 
-	play(name,detune=0) {
+	play(name, detune = 0) {
 		let num = names.indexOf(name);
 
 		if (num >= 0) {
 			this.players[num][detune].start();
 			console.log("paly " + num + "_" + detune);
 		}
+	}
+
+	playBase(detune) {
+		let num = detune % 3;
+		console.log("playBase " + num);
+		this.bases[num].start();
 	}
 
 	playMarimba(detune) {

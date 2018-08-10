@@ -5,6 +5,8 @@ const glslify = require('glslify');
 
 import TyMeshLine from './TyMeshLine';
 
+import fireworks from './fireworks';
+
 
 var colors = [
 	0x4cb151,
@@ -50,11 +52,16 @@ class introObject extends THREE.Object3D {
 				transparent: true,
 			})
 		);
-
-		// this.hand.rotation.y = Math.PI / 2;
 		this.hand.position.y = 1.5;
 		this.hand.renderOrder = 7;
 		this.add(this.hand);
+
+
+
+		this.fw = new fireworks();
+		this.add(this.fw);
+
+
 
 	}
 
@@ -122,17 +129,31 @@ class introObject extends THREE.Object3D {
 
 	clearT(callback) {
 
-		if(!That.curLine)return;
-
+		if (!That.curLine) return;
 		That.curLine.removeThis(function(_that) {
 			That.remove(_that);
-			if(callback)callback();
+
+			if (callback) callback();
 		});
+	}
+
+	update(dt) {
+
 	}
 
 
 
-	removeThis(callback) {}
+	removeThis() {
+		if (this.hand) this.remove(this.hand);
+		if (this.fw) {
+			this.fw.removeThis(function(){
+				That.remove(That.fw);
+			})
+		}
+
+			
+
+	}
 
 }
 
