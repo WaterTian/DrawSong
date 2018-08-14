@@ -129,7 +129,10 @@ class introObject extends THREE.Object3D {
 
 	clearT(callback) {
 
-		if (!That.curLine) return;
+		if (!That.curLine){
+			if (callback) callback();
+			return;
+		} 
 		That.curLine.removeThis(function(_that) {
 			That.remove(_that);
 

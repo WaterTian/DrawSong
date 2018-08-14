@@ -107,7 +107,7 @@ class linesScene {
 				"id": "MobileStart"
 			}).appendTo("body");
 			var button = $("<div>").attr("id", "Button").text("Enter").appendTo(element);
-			
+
 			StartAudioContext(Tone.context, element, function() {
 				element.remove();
 				setTimeout(That.initIntro, 1000);
@@ -284,10 +284,13 @@ class linesScene {
 		let _ps = Recognizer.Unistrokes[0];
 		let _nt = 'a';
 
-		That.intro.drawT(_ps, function() {
-			That.tyAudio.play(_nt, 2);
-			That.introT = 'a';
+		That.intro.clearT(function() {
+			That.intro.drawT(_ps, function() {
+				That.tyAudio.play(_nt, 2);
+				That.introT = 'a';
+			});
 		});
+
 	}
 	initIntroB() {
 		That.clearMuisc();
@@ -502,37 +505,75 @@ class linesScene {
 		console.log("order " + That.curLine.order);
 
 
-		let useT = !document.getElementById('useT').checked
+		let useT = !document.getElementById('useT').checked;
 
-		if (useT) {
+		// Intro 
+		if (isIntro) {
+			// 识别出
 			if (result.Score > 2) {
 				That.curLine.audioName = result.Name;
-				console.log("paly " + result.Name + "_" + That.curLine.detune);
-				That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
 
-				////
-				if (isIntro) {
-					if (That.introT == 'a' && result.Name == 'a') {
-						That.intro.fw.open();
-						setTimeout(That.initIntroB, 1200);
-					}
-					if (That.introT == 'b' && result.Name == 'b') {
-						That.intro.fw.open();
-						setTimeout(That.initIntroC, 1200);
-					}
-					if (That.introT == 'c' && result.Name == 'c') {
-						That.intro.fw.open();
-						setTimeout(That.removeIntro, 1200);
-					}
+				if (That.introT == 'a' && result.Name == 'a') {
+					That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
+					That.intro.fw.open();
+					That.tyAudio.playWin();
+					setTimeout(That.initIntroB, 1200);
+					
+				} else if (That.introT == 'b' && result.Name == 'b') {
+					That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
+					That.intro.fw.open();
+					That.tyAudio.playWin();
+					setTimeout(That.initIntroC, 1200);
+					
+				} else if (That.introT == 'c' && result.Name == 'c') {
+					That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
+					That.intro.fw.open();
+					That.tyAudio.playWin();
+					setTimeout(That.removeIntro, 1200);
+					
+				} else {
 
+					//识别出 ABC 以外的字母
+					That.tyAudio.playBase(That.curLine.detune);
+
+					if (That.introT == 'a')That.initIntroA();
+					if (That.introT == 'b')That.initIntroB();
+					if (That.introT == 'c')That.initIntroC();
+					
 				}
-
-			} else {
-				That.tyAudio.playBase(That.curLine.detune);
 			}
-		}else{
-			That.tyAudio.playMarimba(That.curLine.detune);
+			// 未识别出
+			else {
+				That.tyAudio.playBase(That.curLine.detune);
+
+					if (That.introT == 'a')That.initIntroA();
+					if (That.introT == 'b')That.initIntroB();
+					if (That.introT == 'c')That.initIntroC();
+
+			}
+
 		}
+		// Scene
+		else {
+			// 识别字母
+			if (useT) {
+				// 识别出
+				if (result.Score > 2) {
+					That.curLine.audioName = result.Name;
+					That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
+				}
+				// 未识别出
+				else {
+					That.tyAudio.playBase(That.curLine.detune);
+				}
+			}
+			// 不识别字母 
+			else {
+				// 不识别字母直接播放木琴
+				That.tyAudio.playMarimba(That.curLine.detune);
+			}
+		}
+
 
 		That.curLine.shake();
 
@@ -662,12 +703,13 @@ class linesScene {
 
 			if (l.order == curPlayNum) {
 
-				if(useT){
+				if (useT) {
 					if (l.audioName) That.tyAudio.play(l.audioName, l.detune);
 					else That.tyAudio.playBase(l.detune);
-				}else{
-					That.tyAudio.playMarimba(l.detune);
-				} 
+				} else {
+					if (l.audioName) That.tyAudio.playMarimba(l.detune);
+					else That.tyAudio.playBase(l.detune);
+				}
 
 				l.shake();
 			}

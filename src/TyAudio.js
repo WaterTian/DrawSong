@@ -55,6 +55,11 @@ class TyAudio {
 			That.bases.push(player);
 		}
 
+		this.win = new Tone.Player({
+			"url": "./assets/win.mp3",
+			"loop": false,
+		}).fan(That.waveform).toMaster();
+
 
 		this.drawBtnWave();
 	}
@@ -79,6 +84,9 @@ class TyAudio {
 		this.marimbas[detune].start();
 	}
 
+	playWin() {
+		this.win.start();
+	}
 
 
 	drawBtnWave() {
