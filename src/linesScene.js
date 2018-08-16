@@ -110,20 +110,45 @@ class linesScene {
 
 			StartAudioContext(Tone.context, element, function() {
 				element.remove();
-				setTimeout(That.initIntro, 1000);
+				That.initUnit();
 			});
 		} else {
 
-			setTimeout(That.initIntro, 1000);
+			That.initUnit();
 		}
 
 
-		this.tyAudio = new TyAudio();
-
 		// That.initUI();
+	}
 
+
+	initUnit(){
+
+		let btn1 = document.getElementById('unitBtn1');
+		btn1.addEventListener('click', function(){
+			console.log("unit1");
+
+			document.querySelector(".unit").style.display = "none";
+
+            That.tyAudio = new TyAudio('abc');
+			That.initIntro('abc',[0,2,4]);
+
+		});
+
+		let btn2 = document.getElementById('unitBtn2');
+		btn2.addEventListener('click', function(){
+			console.log("unit2");
+
+			document.querySelector(".unit").style.display = "none";
+
+            That.tyAudio = new TyAudio('cde');
+			That.initIntro('cde',[4,5,8]);
+		});
 
 	}
+
+
+
 
 	init() {
 
@@ -265,7 +290,7 @@ class linesScene {
 	/////////////////////////////init
 
 
-	initIntro() {
+	initIntro(_ts,_rNs) {
 
 		isIntro = true;
 
@@ -276,43 +301,46 @@ class linesScene {
 
 		That.introT = '';
 
-		That.initIntroA();
+		That.intro.TS = _ts.split("");
+		That.intro.RecognizerNums = _rNs;
+
+		That.initIntro1();
 	}
 
-	initIntroA() {
+	initIntro1() {
 		That.clearMuisc();
-		let _ps = Recognizer.Unistrokes[0];
-		let _nt = 'a';
+		let _ps = Recognizer.Unistrokes[That.intro.RecognizerNums[0]];
+		let _nt = That.intro.TS[0];
 
 		That.intro.clearT(function() {
 			That.intro.drawT(_ps, function() {
 				That.tyAudio.play(_nt, 2);
-				That.introT = 'a';
+				That.introT = _nt;
 			});
 		});
 
 	}
-	initIntroB() {
+	initIntro2() {
 		That.clearMuisc();
-		let _ps = Recognizer.Unistrokes[2];
-		let _nt = 'b';
+		let _ps = Recognizer.Unistrokes[That.intro.RecognizerNums[1]];
+		let _nt = That.intro.TS[1];
 
 		That.intro.clearT(function() {
 			That.intro.drawT(_ps, function() {
 				That.tyAudio.play(_nt, 2);
-				That.introT = 'b';
+				That.introT = _nt;
 			});
 		});
 	}
-	initIntroC() {
+	initIntro3() {
 		That.clearMuisc();
-		let _ps = Recognizer.Unistrokes[4];
-		let _nt = 'c';
+		let _ps = Recognizer.Unistrokes[That.intro.RecognizerNums[2]];
+		let _nt = That.intro.TS[2];
 
 		That.intro.clearT(function() {
 			That.intro.drawT(_ps, function() {
 				That.tyAudio.play(_nt, 2);
-				That.introT = 'c';
+				That.introT = _nt;
 			});
 		});
 	}
@@ -513,19 +541,19 @@ class linesScene {
 			if (result.Score > 2) {
 				That.curLine.audioName = result.Name;
 
-				if (That.introT == 'a' && result.Name == 'a') {
+				if (That.introT == That.intro.TS[0] && result.Name == That.intro.TS[0]) {
 					That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
 					That.intro.fw.open();
 					That.tyAudio.playWin();
-					setTimeout(That.initIntroB, 1200);
+					setTimeout(That.initIntro2, 1200);
 					
-				} else if (That.introT == 'b' && result.Name == 'b') {
+				} else if (That.introT == That.intro.TS[1] && result.Name == That.intro.TS[1]) {
 					That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
 					That.intro.fw.open();
 					That.tyAudio.playWin();
-					setTimeout(That.initIntroC, 1200);
+					setTimeout(That.initIntro3, 1200);
 					
-				} else if (That.introT == 'c' && result.Name == 'c') {
+				} else if (That.introT == That.intro.TS[2] && result.Name == That.intro.TS[2]) {
 					That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
 					That.intro.fw.open();
 					That.tyAudio.playWin();
@@ -536,9 +564,9 @@ class linesScene {
 					//识别出 ABC 以外的字母
 					That.tyAudio.playBase(That.curLine.detune);
 
-					if (That.introT == 'a')That.initIntroA();
-					if (That.introT == 'b')That.initIntroB();
-					if (That.introT == 'c')That.initIntroC();
+					if (That.introT == That.intro.TS[0])That.initIntro1();
+					if (That.introT == That.intro.TS[1])That.initIntro2();
+					if (That.introT == That.intro.TS[2])That.initIntro3();
 					
 				}
 			}
@@ -546,9 +574,9 @@ class linesScene {
 			else {
 				That.tyAudio.playBase(That.curLine.detune);
 
-					if (That.introT == 'a')That.initIntroA();
-					if (That.introT == 'b')That.initIntroB();
-					if (That.introT == 'c')That.initIntroC();
+					if (That.introT == That.intro.TS[0])That.initIntro1();
+					if (That.introT == That.intro.TS[1])That.initIntro2();
+					if (That.introT == That.intro.TS[2])That.initIntro3();
 
 			}
 
@@ -595,6 +623,9 @@ class linesScene {
 		this.render(newTime - time);
 		time = newTime;
 
+		if(That.intro){
+			// That.intro.rotation.y+=0.03;
+		}
 
 	}
 

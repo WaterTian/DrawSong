@@ -148,13 +148,13 @@ class TyMeshLine extends THREE.Mesh {
 	}
 
 	removeThis(callback) {
-		TweenMax.to(this.uniforms.visibility, .6, {
+		TweenMax.to(this.uniforms.visibility, .3, {
 			value: 0,
 			onComplete: function() {
 				callback(That);
 			}
 		});
-		TweenMax.to(this.position, .6, {
+		TweenMax.to(this.position, .3, {
 			z: -300
 		});
 	}

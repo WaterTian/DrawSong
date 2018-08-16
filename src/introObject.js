@@ -32,6 +32,11 @@ class introObject extends THREE.Object3D {
 		super();
 		That = this;
 
+		//要学的字母
+		this.TS =[];
+		//字母对应识别编号
+		this.RecognizerNums =[];
+
 
 		this.hand = new THREE.Mesh(
 			new THREE.PlaneBufferGeometry(60, 60),
@@ -123,7 +128,7 @@ class introObject extends THREE.Object3D {
 
 
 			_num += 2;
-			setTimeout(draw, 30);
+			setTimeout(draw, 20);
 		}
 	}
 

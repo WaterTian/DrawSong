@@ -3,15 +3,16 @@ import Tone from 'Tone';
 
 
 let That;
-// const names = 'asdfghjklqwertyuiopzxcvbnm';
-const names = 'abcd';
+
 
 class TyAudio {
 
-	constructor() {
+	constructor(names = 'abc') {
 		That = this;
 
+		console.log("Audio "+names);
 
+        this.names = names;
 		let namesArr = names.split("");
 		this.players = [];
 		this.waveform = new Tone.Waveform(128);
@@ -65,11 +66,15 @@ class TyAudio {
 	}
 
 	play(name, detune = 0) {
-		let num = names.indexOf(name);
+		let num = this.names.indexOf(name);
 
 		if (num >= 0) {
 			this.players[num][detune].start();
 			console.log("paly " + num + "_" + detune);
+		}else{
+			console.log("none audio paly base");
+
+			That.playBase(detune);
 		}
 	}
 
