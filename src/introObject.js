@@ -28,14 +28,14 @@ var colors = [
 let That;
 class introObject extends THREE.Object3D {
 
-	constructor() {
+	constructor(handTexture = null) {
 		super();
 		That = this;
 
 		//要学的字母
-		this.TS =[];
+		this.TS = [];
 		//字母对应识别编号
-		this.RecognizerNums =[];
+		this.RecognizerNums = [];
 
 
 		this.hand = new THREE.Mesh(
@@ -43,7 +43,7 @@ class introObject extends THREE.Object3D {
 			new THREE.RawShaderMaterial({
 				uniforms: {
 					map: {
-						value: new THREE.TextureLoader().load('./assets/hand.png')
+						value: handTexture
 					},
 					opacity: {
 						value: 1
@@ -134,10 +134,10 @@ class introObject extends THREE.Object3D {
 
 	clearT(callback) {
 
-		if (!That.curLine){
+		if (!That.curLine) {
 			if (callback) callback();
 			return;
-		} 
+		}
 		That.curLine.removeThis(function(_that) {
 			That.remove(_that);
 
@@ -154,12 +154,12 @@ class introObject extends THREE.Object3D {
 	removeThis() {
 		if (this.hand) this.remove(this.hand);
 		if (this.fw) {
-			this.fw.removeThis(function(){
+			this.fw.removeThis(function() {
 				That.remove(That.fw);
 			})
 		}
 
-			
+
 
 	}
 

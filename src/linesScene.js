@@ -8,12 +8,8 @@ import Tone from 'Tone';
 
 
 import TyAudio from './TyAudio';
-
 import TyMeshLine from './TyMeshLine';
-
 import TyRecognizer from './TyRecognizer';
-
-
 import introObject from './introObject';
 
 
@@ -79,6 +75,14 @@ var curPlayNum = 0;
 var isIntro = true;
 
 
+
+var lineTexture = new THREE.TextureLoader().load('assets/s.jpg');
+lineTexture.wrapS = THREE.RepeatWrapping;
+lineTexture.wrapT = THREE.RepeatWrapping;
+
+var handTexture = new THREE.TextureLoader().load('assets/hand.png');
+
+
 function Point(x, y) // constructor
 {
 	this.X = x;
@@ -96,8 +100,9 @@ class linesScene {
 		// this.stats = new Stats();
 		// document.body.appendChild(this.stats.dom);
 
-		this.container = document.getElementById('webglContainer');
 
+
+		this.container = document.getElementById('webglContainer');
 		this.init();
 
 
@@ -141,8 +146,8 @@ class linesScene {
 
 			document.querySelector(".unit").style.display = "none";
 
-            That.tyAudio = new TyAudio('cde');
-			That.initIntro('cde',[4,5,8]);
+            That.tyAudio = new TyAudio('ovs');
+			That.initIntro('ovs',[9,10,11]);
 		});
 
 	}
@@ -296,7 +301,7 @@ class linesScene {
 
 		That.initLines();
 
-		That.intro = new introObject();
+		That.intro = new introObject(handTexture);
 		That.scene.add(That.intro);
 
 		That.introT = '';
@@ -467,14 +472,8 @@ class linesScene {
 
 		line.uniforms.color.value = new THREE.Color(colors[Math.floor(Math.random() * colors.length)]);
 
-		var texture = new THREE.TextureLoader().load('assets/s.jpg');
-		texture.wrapS = THREE.RepeatWrapping;
-		texture.wrapT = THREE.RepeatWrapping;
-
 		line.uniforms.useMap.value = 1;
-		line.uniforms.map.value = texture;
-
-
+		line.uniforms.map.value = lineTexture;
 
 		line.uniforms.sizeAttenuation.value = 1;
 
