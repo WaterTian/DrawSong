@@ -1,6 +1,4 @@
 # 画儿歌
-## line shaders
-
 
 
 ## Installation
