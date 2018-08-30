@@ -9,4 +9,4 @@ Install dependencies with:
 
 Then run:
 
-`npm run start`
+`npm run dev`
