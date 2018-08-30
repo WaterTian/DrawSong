@@ -5,18 +5,29 @@ const glslify = require('glslify');
 
 class TyCard extends THREE.Mesh {
 
-  constructor(texture) {
+  constructor(_texture, _color = null) {
     super();
 
-    this.w = texture.image.width;
-    this.h = texture.image.height;
+    this.w = _texture.image.width;
+    this.h = _texture.image.height;
+
+    let _useColor = 0;
+    if (_color) _useColor = 1;
+
 
     this.uniforms = {
       map: {
-        value: texture
+        value: _texture
       },
       opacity: {
         value: 0
+      },
+      useColor: {
+        type: 'f',
+        value: _useColor
+      },
+      color: {
+        value: new THREE.Color(_color)
       }
     };
 

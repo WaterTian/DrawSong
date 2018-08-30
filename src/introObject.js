@@ -5,6 +5,8 @@ import TyCard from './TyCard';
 import TyMeshLine from './TyMeshLine';
 import fireworks from './fireworks';
 
+import TyEmoji from './TyEmoji';
+
 
 var colors = [
 	0x4cb151,
@@ -36,7 +38,7 @@ class introObject extends THREE.Object3D {
 		this.RecognizerNums = [];
 
 
-		this.hand = new TyCard(handTexture, 2);
+		this.hand = new TyCard(handTexture);
 		this.hand.scale.x = this.hand.scale.y = 0.5;
 		this.hand.position.y = 1.5;
 		this.hand.renderOrder = 7;
@@ -47,6 +49,12 @@ class introObject extends THREE.Object3D {
 
 		this.fw = new fireworks();
 		this.add(this.fw);
+
+
+        ///test
+		this.emoji = new TyEmoji();
+		this.add(this.emoji);
+		this.emoji.position.y = 200;
 
 	}
 
