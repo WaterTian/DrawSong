@@ -21,7 +21,6 @@ const Recognizer = new TyRecognizer();
 const StartAudioContext = require('./StartAudioContext.js');
 
 
-
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 window.floatType = isMobile ? THREE.HalfFloatType : THREE.FloatType;
 
@@ -72,7 +71,7 @@ var isPlaying = false;
 var curPlayNum = 0;
 
 
-var isIntro = true;
+var isIntro = false;
 
 
 
@@ -96,11 +95,9 @@ class linesScene {
 	constructor() {
 		That = this;
 
-		// this.vconsole = new VConsole();
-		// this.stats = new Stats();
-		// document.body.appendChild(this.stats.dom);
-
-
+		this.vconsole = new VConsole();
+		this.stats = new Stats();
+		document.body.appendChild(this.stats.dom);
 
 		this.container = document.getElementById('webglContainer');
 		this.init();
@@ -121,9 +118,6 @@ class linesScene {
 
 			That.initUnit();
 		}
-
-
-		// That.initUI();
 	}
 
 
@@ -185,38 +179,6 @@ class linesScene {
 
 
 		this.camera = this.camera1;
-
-
-		/*		this.scene.add(new THREE.AmbientLight(0xf0f0f0));
-				var light = new THREE.SpotLight(0xffffff, 1.5);
-				light.position.set(0, 1500, 200);
-				light.castShadow = true;
-				light.shadow = new THREE.LightShadow(new THREE.PerspectiveCamera(70, 1, 200, 2000));
-				light.shadow.bias = -0.000222;
-				light.shadow.mapSize.width = 1024;
-				light.shadow.mapSize.height = 1024;
-				this.scene.add(light);
-
-				var planeGeometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
-				planeGeometry.rotateX( - Math.PI / 2 );
-				var planeMaterial = new THREE.ShadowMaterial( { opacity: 0.2 } );
-				var plane = new THREE.Mesh( planeGeometry, planeMaterial );
-				plane.position.y = -200;
-				plane.receiveShadow = true;
-				this.scene.add( plane );
-
-				var helper = new THREE.GridHelper( 2000, 100 );
-				helper.position.y = - 199;
-				helper.material.opacity = 0.25;
-				helper.material.transparent = true;
-				this.scene.add( helper );
-
-				var geometry = new THREE.BoxGeometry( 100, 100, 100 );
-				var material = new THREE.MeshNormalMaterial();
-				var cube = new THREE.Mesh( geometry, material );
-				this.scene.add( cube );
-				cube.castShadow = true;
-		*/
 
 
 		// init renderer
@@ -376,8 +338,6 @@ class linesScene {
 		// this.curPoints = [0, 0, 0, -cw / 2, 0, 0, -cw / 2, ch / 2, 0, 0, ch / 2, 0, 0, 0, 0];
 		// this.addLine();
 		// this.addPoint();
-
-
 
 		if (('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0)) {
 			this.renderer.domElement.addEventListener("touchstart", (e) => {

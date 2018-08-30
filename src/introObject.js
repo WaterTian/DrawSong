@@ -1,10 +1,8 @@
 import * as THREE from 'three';
 import TweenMax from "gsap";
-
 const glslify = require('glslify');
-
+import TyCard from './TyCard';
 import TyMeshLine from './TyMeshLine';
-
 import fireworks from './fireworks';
 
 
@@ -38,35 +36,17 @@ class introObject extends THREE.Object3D {
 		this.RecognizerNums = [];
 
 
-		this.hand = new THREE.Mesh(
-			new THREE.PlaneBufferGeometry(60, 60),
-			new THREE.RawShaderMaterial({
-				uniforms: {
-					map: {
-						value: handTexture
-					},
-					opacity: {
-						value: 1
-					}
-				},
-				vertexShader: glslify('./glsl/card.vert'),
-				fragmentShader: glslify('./glsl/card.frag'),
-				side: THREE.DoubleSide,
-				depthWrite: false,
-				depthTest: false,
-				transparent: true,
-			})
-		);
+		this.hand = new TyCard(handTexture, 2);
+		this.hand.scale.x = this.hand.scale.y = 0.5;
 		this.hand.position.y = 1.5;
 		this.hand.renderOrder = 7;
-		this.add(this.hand);
+		
 
+		this.add(this.hand);
 
 
 		this.fw = new fireworks();
 		this.add(this.fw);
-
-
 
 	}
 
@@ -95,12 +75,7 @@ class introObject extends THREE.Object3D {
 
 		this.curLine = line;
 
-
-
-		TweenMax.to(That.hand.material.uniforms.opacity, .6, {
-			value: 1,
-			ease: Strong.easeOut
-		});
+		That.hand.show();
 
 
 		draw();
@@ -110,11 +85,7 @@ class introObject extends THREE.Object3D {
 
 				callback();
 				line.shake();
-
-				TweenMax.to(That.hand.material.uniforms.opacity, .6, {
-					value: 0,
-					ease: Strong.easeOut
-				});
+				That.hand.hide();
 				return;
 			}
 
