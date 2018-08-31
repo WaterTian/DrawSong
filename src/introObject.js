@@ -5,8 +5,6 @@ import TyCard from './TyCard';
 import TyMeshLine from './TyMeshLine';
 import fireworks from './fireworks';
 
-import TyEmoji from './TyEmoji';
-
 
 var colors = [
 	0x4cb151,
@@ -42,7 +40,7 @@ class introObject extends THREE.Object3D {
 		this.hand.scale.x = this.hand.scale.y = 0.5;
 		this.hand.position.y = 1.5;
 		this.hand.renderOrder = 7;
-		
+
 
 		this.add(this.hand);
 
@@ -50,11 +48,6 @@ class introObject extends THREE.Object3D {
 		this.fw = new fireworks();
 		this.add(this.fw);
 
-
-        ///test
-		this.emoji = new TyEmoji();
-		this.add(this.emoji);
-		this.emoji.position.y = 200;
 
 	}
 
@@ -70,10 +63,10 @@ class introObject extends THREE.Object3D {
 		let curPoints = [];
 		let _num = 0;
 
-		let line = new TyMeshLine(64);
+		let _color = colors[Math.floor(Math.random() * colors.length)];
+		let line = new TyMeshLine(64, _color);
 		this.add(line);
 
-		line.uniforms.color.value = new THREE.Color(colors[Math.floor(Math.random() * colors.length)]);
 		var texture = new THREE.TextureLoader().load('assets/s.jpg');
 		texture.wrapS = THREE.RepeatWrapping;
 		texture.wrapT = THREE.RepeatWrapping;
@@ -94,6 +87,10 @@ class introObject extends THREE.Object3D {
 				callback();
 				line.shake();
 				That.hand.hide();
+				///
+				line.addEmoji();
+
+
 				return;
 			}
 
@@ -122,7 +119,10 @@ class introObject extends THREE.Object3D {
 
 			if (callback) callback();
 		});
+
 	}
+
+
 
 	update(dt) {
 

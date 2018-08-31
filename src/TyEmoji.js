@@ -7,11 +7,11 @@ import TyCard from './TyCard';
 let That;
 class TyEmoji extends THREE.Object3D {
 
-	constructor(initCallback = null) {
+	constructor(_color = 0xcdcdcd) {
 		super();
 		That = this;
 
-		this.initCallback = initCallback;
+		this.eyeColor =  new THREE.Color(_color).multiplyScalar(0.6);
 
 
 		var startAssets = ['./assets/eye_l0.png', './assets/eye_r0.png'];
@@ -20,26 +20,25 @@ class TyEmoji extends THREE.Object3D {
 		this.loadedTexs(startAssets, startTex, () => {
 
 			That.eyeLTexs = [startTex[0]];
-			That.eyeL = new TyCard(startTex[0],0xff00ff);
-			That.eyeL.scale.x = That.eyeL.scale.y = 0.5;
-			That.eyeL.position.x = -50;
-			// That.eyeL.position.y = 1.5;
+			That.eyeL = new TyCard(startTex[0], That.eyeColor);
+			That.eyeL.scale.x = That.eyeL.scale.y = 0.1;
+			That.eyeL.position.x = -15;
+			That.eyeL.position.y = 15;
 			That.eyeL.renderOrder = 7;
 			That.add(That.eyeL);
 
 			That.eyeRTexs = [startTex[1]];
-			That.eyeR = new TyCard(startTex[1],0xff00ff);
-			That.eyeR.scale.x = That.eyeR.scale.y = 0.5;
-			That.eyeR.position.x = 50;
-			// That.eyeR.position.y = 1.5;
+			That.eyeR = new TyCard(startTex[1], That.eyeColor);
+			That.eyeR.scale.x = That.eyeR.scale.y = 0.1;
+			That.eyeR.position.x = 15;
+			That.eyeR.position.y = 15;
 			That.eyeR.renderOrder = 7;
 			That.add(That.eyeR);
 
 
-			if (That.initCallback) That.initCallback();
 
 			That.loadMotions();
-			That.updateFrame();
+			That.blink(That);
 
 		});
 	}
@@ -47,25 +46,36 @@ class TyEmoji extends THREE.Object3D {
 
 	loadMotions() {
 		this.eyeLNum = 0;
-		this.loadedTexFrames('eye_l', 3, this.eyeLTexs);
+		this.loadedTexFrames('eye_l', 6, this.eyeLTexs);
 
 		this.eyeRNum = 0;
-		this.loadedTexFrames('eye_r', 3, this.eyeRTexs);
+		this.loadedTexFrames('eye_r', 6, this.eyeRTexs);
 	}
 
 
-	updateFrame() {
-		if (!That) return;
+	blink(_this) {
+		let That = _this;
 
-		setTimeout(That.updateFrame, 100);
+		That.blinkId = setTimeout(function(){
+			That.blink(That);
+		}, 2000 + Math.random() * 2000);
+		let _part = Math.floor(Math.random() * 2) + 1;
 
-		if (That.eyeLNum >= That.eyeLTexs.length) That.eyeLNum = 0;
-		That.eyeL.setMap(That.eyeLTexs[That.eyeLNum]);
-		That.eyeLNum++;
+		// console.log("blink " + _part);
 
-		if (That.eyeRNum >= That.eyeRTexs.length) That.eyeRNum = 0;
-		That.eyeR.setMap(That.eyeRTexs[That.eyeRNum]);
-		That.eyeRNum++;
+		updateFrame();
+		function updateFrame() {
+			if (That.eyeLNum == _part * 3) That.eyeLNum = That.eyeRNum = (_part - 1) * 3;
+			else setTimeout(updateFrame, 80);
+
+			if (That.eyeLNum >= That.eyeLTexs.length) That.eyeLNum = 0;
+			That.eyeL.setMap(That.eyeLTexs[That.eyeLNum]);
+			That.eyeLNum++;
+
+			if (That.eyeRNum >= That.eyeRTexs.length) That.eyeRNum = 0;
+			That.eyeR.setMap(That.eyeRTexs[That.eyeRNum]);
+			That.eyeRNum++;
+		}
 
 	}
 
@@ -82,7 +92,7 @@ class TyEmoji extends THREE.Object3D {
 				_num++;
 				if (_num < assets.length) loadAssets();
 				else {
-					console.log("intro_completeLoad");
+					console.log("emoji_completeLoad");
 					callBack();
 				}
 			})
@@ -100,13 +110,11 @@ class TyEmoji extends THREE.Object3D {
 				_num++;
 				if (_num < frames) loadAssets();
 				else {
-					console.log("completeLoad " + name);
+					// console.log("completeLoad " + name);
 				}
 			})
 		}
 	}
-
-
 
 }
 

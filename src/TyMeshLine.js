@@ -1,18 +1,19 @@
 import * as THREE from 'three';
 import TweenMax from "gsap";
-
 const glslify = require('glslify');
 
+import TyEmoji from './TyEmoji';
 
 let That;
 class TyMeshLine extends THREE.Mesh {
 
 	///_type :none / linear / parabolic / wavy 
-	constructor(_width = 10) {
+	constructor(_width = 10, _color = 0x000000) {
 		super();
 		That = this;
 
 		this.lineWidth = _width;
+		this.lineColor = _color;
 		this.random = Math.random();
 		this.order = null; //播放顺序
 		this.detune = 0; //音高
@@ -58,7 +59,7 @@ class TyMeshLine extends THREE.Mesh {
 			},
 			color: {
 				type: 'c',
-				value: new THREE.Color(0xffffff)
+				value: new THREE.Color(this.lineColor)
 			},
 			opacity: {
 				type: 'f',
@@ -134,9 +135,9 @@ class TyMeshLine extends THREE.Mesh {
 				}
 			}
 
-			var cx=minX+(maxX-minX)/2;
-			var cy=minY+(maxY-minY)/2;
-			this.center=[cx,cy];
+			var cx = minX + (maxX - minX) / 2;
+			var cy = minY + (maxY - minY) / 2;
+			this.center = [cx, cy];
 
 		} else {
 			console.log("input points with Float32Array or Array");
@@ -146,6 +147,17 @@ class TyMeshLine extends THREE.Mesh {
 
 
 	}
+
+    ///////////
+    ///
+	addEmoji() {
+		this.emoji = new TyEmoji(That.lineColor);
+		this.add(this.emoji);
+		this.emoji.position.x = That.center[0];
+		this.emoji.position.y =  That.center[1];
+
+	}
+
 
 	removeThis(callback) {
 		TweenMax.to(this.uniforms.visibility, .3, {
@@ -157,16 +169,19 @@ class TyMeshLine extends THREE.Mesh {
 		TweenMax.to(this.position, .3, {
 			z: -300
 		});
+
+		///remove emoji
+		if(this.emoji) this.remove(this.emoji);
 	}
 
 	shake() {
 		TweenMax.to(this.position, .5, {
-			z:50,
+			z: 50,
 			ease: Elastic.easeOut
 		});
 		TweenMax.to(this.position, 1, {
 			z: 0,
-			delay:.6,
+			delay: .6,
 			ease: Linear.easeNone
 		});
 
@@ -176,7 +191,7 @@ class TyMeshLine extends THREE.Mesh {
 		});
 		TweenMax.to(this.uniforms.colorAdd, .5, {
 			value: 1.1,
-			delay:.5,
+			delay: .5,
 		});
 
 	}

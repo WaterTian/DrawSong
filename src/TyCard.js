@@ -13,6 +13,8 @@ class TyCard extends THREE.Mesh {
 
     let _useColor = 0;
     if (_color) _useColor = 1;
+    else _color = new THREE.Color(0x000000);
+
 
 
     this.uniforms = {
@@ -27,7 +29,7 @@ class TyCard extends THREE.Mesh {
         value: _useColor
       },
       color: {
-        value: new THREE.Color(_color)
+        value: _color
       }
     };
 

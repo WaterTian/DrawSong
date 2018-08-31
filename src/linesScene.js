@@ -13,6 +13,7 @@ import TyRecognizer from './TyRecognizer';
 import introObject from './introObject';
 
 
+
 const OrbitControls = OrbitContructor(THREE);
 const glslify = require('glslify');
 const Recognizer = new TyRecognizer();
@@ -121,31 +122,30 @@ class linesScene {
 	}
 
 
-	initUnit(){
+	initUnit() {
 
 		let btn1 = document.getElementById('unitBtn1');
-		btn1.addEventListener('click', function(){
+		btn1.addEventListener('click', function() {
 			console.log("unit1");
 
 			document.querySelector(".unit").style.display = "none";
 
-            That.tyAudio = new TyAudio('abc');
-			That.initIntro('abc',[0,2,4]);
+			That.tyAudio = new TyAudio('abc');
+			That.initIntro('abc', [0, 2, 4]);
 
 		});
 
 		let btn2 = document.getElementById('unitBtn2');
-		btn2.addEventListener('click', function(){
+		btn2.addEventListener('click', function() {
 			console.log("unit2");
 
 			document.querySelector(".unit").style.display = "none";
 
-            That.tyAudio = new TyAudio('ovs');
-			That.initIntro('ovs',[9,10,11]);
+			That.tyAudio = new TyAudio('ovs');
+			That.initIntro('ovs', [9, 10, 11]);
 		});
 
 	}
-
 
 
 
@@ -257,7 +257,7 @@ class linesScene {
 	/////////////////////////////init
 
 
-	initIntro(_ts,_rNs) {
+	initIntro(_ts, _rNs) {
 
 		isIntro = true;
 
@@ -271,7 +271,10 @@ class linesScene {
 		That.intro.TS = _ts.split("");
 		That.intro.RecognizerNums = _rNs;
 
-		That.initIntro1();
+
+		/////////////////////////////////// skip
+		// That.initIntro1();
+		That.removeIntro();
 	}
 
 	initIntro1() {
@@ -332,6 +335,7 @@ class linesScene {
 
 		this.linesObj = new THREE.Object3D();
 		this.scene.add(this.linesObj);
+
 
 
 
@@ -423,14 +427,12 @@ class linesScene {
 
 	addLine() {
 
-		let line = new TyMeshLine(64);
-
+		let _color = colors[Math.floor(Math.random() * colors.length)];
+		let line = new TyMeshLine(64, _color);
 
 		That.linesObj.add(line);
 		That.lines.push(line);
 		That.curLine = line;
-
-		line.uniforms.color.value = new THREE.Color(colors[Math.floor(Math.random() * colors.length)]);
 
 		line.uniforms.useMap.value = 1;
 		line.uniforms.map.value = lineTexture;
@@ -505,37 +507,37 @@ class linesScene {
 					That.intro.fw.open();
 					That.tyAudio.playWin();
 					setTimeout(That.initIntro2, 1200);
-					
+
 				} else if (That.introT == That.intro.TS[1] && result.Name == That.intro.TS[1]) {
 					That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
 					That.intro.fw.open();
 					That.tyAudio.playWin();
 					setTimeout(That.initIntro3, 1200);
-					
+
 				} else if (That.introT == That.intro.TS[2] && result.Name == That.intro.TS[2]) {
 					That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
 					That.intro.fw.open();
 					That.tyAudio.playWin();
 					setTimeout(That.removeIntro, 1200);
-					
+
 				} else {
 
 					//识别出 ABC 以外的字母
 					That.tyAudio.playBase(That.curLine.detune);
 
-					if (That.introT == That.intro.TS[0])That.initIntro1();
-					if (That.introT == That.intro.TS[1])That.initIntro2();
-					if (That.introT == That.intro.TS[2])That.initIntro3();
-					
+					if (That.introT == That.intro.TS[0]) That.initIntro1();
+					if (That.introT == That.intro.TS[1]) That.initIntro2();
+					if (That.introT == That.intro.TS[2]) That.initIntro3();
+
 				}
 			}
 			// 未识别出
 			else {
 				That.tyAudio.playBase(That.curLine.detune);
 
-					if (That.introT == That.intro.TS[0])That.initIntro1();
-					if (That.introT == That.intro.TS[1])That.initIntro2();
-					if (That.introT == That.intro.TS[2])That.initIntro3();
+				if (That.introT == That.intro.TS[0]) That.initIntro1();
+				if (That.introT == That.intro.TS[1]) That.initIntro2();
+				if (That.introT == That.intro.TS[2]) That.initIntro3();
 
 			}
 
@@ -548,6 +550,7 @@ class linesScene {
 				if (result.Score > 2) {
 					That.curLine.audioName = result.Name;
 					That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
+					That.curLine.addEmoji();
 				}
 				// 未识别出
 				else {
@@ -576,13 +579,14 @@ class linesScene {
 
 
 
+
 	animate() {
 		let newTime = Date.now();
 		requestAnimationFrame(this.animate.bind(this));
 		this.render(newTime - time);
 		time = newTime;
 
-		if(That.intro){
+		if (That.intro) {
 			// That.intro.rotation.y+=0.03;
 		}
 
