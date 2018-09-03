@@ -11,10 +11,17 @@ class TyEmoji extends THREE.Object3D {
 		super();
 		That = this;
 
-		this.eyeColor =  new THREE.Color(_color).multiplyScalar(0.6);
+		this.eyeColor = new THREE.Color(_color).multiplyScalar(0.6);
+
+		this.eyeLTexs = [];
+		this.eyeRTexs = [];
+		this.mouthTexs = [];
+
+		this.isSing = false;
+		this.isLoadComplete= false;
 
 
-		var startAssets = ['./assets/eye_l0.png', './assets/eye_r0.png'];
+		var startAssets = ['./assets/eye_l0.png', './assets/eye_r0.png', './assets/mouth0.png'];
 		var startTex = [];
 
 		this.loadedTexs(startAssets, startTex, () => {
@@ -35,55 +42,102 @@ class TyEmoji extends THREE.Object3D {
 			That.eyeR.renderOrder = 7;
 			That.add(That.eyeR);
 
+			That.mouthTexs = [startTex[2]];
+			That.mouth = new TyCard(startTex[2], That.eyeColor);
+			That.mouth.scale.x = That.mouth.scale.y = 0.15;
+			That.mouth.position.y = -15;
+			That.mouth.renderOrder = 7;
 
 
-			That.loadMotions();
-			That.blink(That);
+			That.loadMotions(() => {
+				That.isLoadComplete= true;
+				That.blink();
+				That.sing();
+			});
 
 		});
 	}
 
 
-	loadMotions() {
-		this.eyeLNum = 0;
-		this.loadedTexFrames('eye_l', 6, this.eyeLTexs);
+	loadMotions(onComplete = null) {
+		let That = this;
+		That.eyeLNum = 0;
+		That.eyeRNum = 0;
+		That.loadedTexFrames('eye_l', 6, That.eyeLTexs, () => {
+			That.loadedTexFrames('eye_r', 6, That.eyeRTexs, () => {
+				That.loadedTexFrames('mouth', 12, That.mouthTexs, () => {
+					if (onComplete) onComplete();
+				});
+			});
+		});
 
-		this.eyeRNum = 0;
-		this.loadedTexFrames('eye_r', 6, this.eyeRTexs);
+
 	}
 
 
-	blink(_this) {
-		let That = _this;
+	sing() {
+		let That = this;
+		let _part = Math.floor(Math.random() * 4);
+		let _frameNum = _part * 3;
 
-		That.blinkId = setTimeout(function(){
+		if(!That.isLoadComplete) return;
+
+		That.add(That.mouth);
+		That.mouth.setMap(That.mouthTexs[_frameNum]);
+
+		setTimeout(()=>{
+			That.mouth.setMap(That.mouthTexs[_frameNum+1]);
+		}, 260);
+		setTimeout(()=>{
+			That.mouth.setMap(That.mouthTexs[_frameNum+2]);
+		}, 320);
+		setTimeout(() => {
+			That.remove(That.mouth);
+		}, 380);
+
+
+		That.isSing = true;
+		let _eyeCloseNum = 2 + Math.floor(Math.random() * 2)*3;
+		That.eyeL.setMap(That.eyeLTexs[_eyeCloseNum]);
+		That.eyeR.setMap(That.eyeRTexs[_eyeCloseNum]);
+		setTimeout(() => {
+			That.isSing = false;
+			That.eyeL.setMap(That.eyeLTexs[0]);
+			That.eyeR.setMap(That.eyeRTexs[0]);
+		}, 300);
+	}
+
+
+	blink() {
+		let That = this;
+
+		That.blinkId = setTimeout(function() {
 			That.blink(That);
-		}, 2000 + Math.random() * 2000);
+		}, 4000 + Math.random() * 4000);
+
 		let _part = Math.floor(Math.random() * 2) + 1;
 
-		// console.log("blink " + _part);
-
 		updateFrame();
+
 		function updateFrame() {
 			if (That.eyeLNum == _part * 3) That.eyeLNum = That.eyeRNum = (_part - 1) * 3;
-			else setTimeout(updateFrame, 80);
+			else setTimeout(updateFrame, 70);
 
 			if (That.eyeLNum >= That.eyeLTexs.length) That.eyeLNum = 0;
-			That.eyeL.setMap(That.eyeLTexs[That.eyeLNum]);
+			if(!That.isSing)That.eyeL.setMap(That.eyeLTexs[That.eyeLNum]);
 			That.eyeLNum++;
 
 			if (That.eyeRNum >= That.eyeRTexs.length) That.eyeRNum = 0;
-			That.eyeR.setMap(That.eyeRTexs[That.eyeRNum]);
+			if(!That.isSing)That.eyeR.setMap(That.eyeRTexs[That.eyeRNum]);
 			That.eyeRNum++;
 		}
-
 	}
 
 
 
 	loadedTexs(assets, textureArr, callBack) {
-		var loader = new THREE.TextureLoader();
-		var _num = 0;
+		let loader = new THREE.TextureLoader();
+		let _num = 0;
 		loadAssets();
 
 		function loadAssets() {
@@ -99,9 +153,9 @@ class TyEmoji extends THREE.Object3D {
 		}
 	}
 
-	loadedTexFrames(name, frames, pics) {
-		var loader = new THREE.TextureLoader();
-		var _num = 0;
+	loadedTexFrames(name, frames, pics, callBack) {
+		let loader = new THREE.TextureLoader();
+		let _num = 0;
 		loadAssets();
 
 		function loadAssets() {
@@ -111,6 +165,7 @@ class TyEmoji extends THREE.Object3D {
 				if (_num < frames) loadAssets();
 				else {
 					// console.log("completeLoad " + name);
+					if (callBack) callBack();
 				}
 			})
 		}

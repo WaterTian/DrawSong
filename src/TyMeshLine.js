@@ -194,6 +194,9 @@ class TyMeshLine extends THREE.Mesh {
 			delay: .5,
 		});
 
+		///emoji sing
+		if(this.emoji)this.emoji.sing();
+
 	}
 
 	updateWidth(_time) {
