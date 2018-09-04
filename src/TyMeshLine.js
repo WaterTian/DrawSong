@@ -175,52 +175,59 @@ class TyMeshLine extends THREE.Mesh {
 	}
 
 	shake() {
-		// TweenMax.to(this.position, 1, {
-		// 	z: 50,
+		let That = this;
+
+		TweenMax.to(That.position, .5, {
+			x: -That.center[0]/4,
+			y: -That.center[1]/4,
+			z: 300,
+			ease: Elastic.easeOut
+		});
+		TweenMax.to(That.position, 1, {
+			x: 0,
+			y: 0,
+			z: 0,
+			delay: .5,
+			ease: Linear.easeNone
+		});
+		// TweenMax.to(That.scale, .5, {
+		// 	x: 1.25,
+		// 	y: 1.25,
 		// 	ease: Elastic.easeOut
 		// });
-		// TweenMax.to(this.position, 1, {
-		// 	z: 0,
-		// 	delay: 1,
+		// TweenMax.to(That.scale, 1, {
+		// 	x: 1,
+		// 	y: 1,
+		// 	delay: .5,
 		// 	ease: Linear.easeNone
 		// });
 
 
 
-		TweenMax.to(this.uniforms.wobble, 1, {
-			value: 20,
+		TweenMax.to(That.uniforms.wobble, 0.5, {
+			value: 24,
 			ease: Strong.easeOut
 		});
-		// this.uniforms.wobble.value =20;
-		TweenMax.to(this.uniforms.wobble, 2, {
+		TweenMax.to(That.uniforms.wobble, 1.5, {
 			value: 0,
-			delay: 1,
+			delay: .5,
 			ease: Linear.easeNone
 		});
 
-		// this.uniforms.time.value =0;
-		// TweenMax.to(this.uniforms.time, 2, {
-		// 	value: 20,
-		// 	ease: Strong.easeOut
-		// });
 
-
-
-		TweenMax.to(this.uniforms.colorAdd, .5, {
+		TweenMax.to(That.uniforms.colorAdd, .5, {
 			value: 1.36,
 			ease: Elastic.easeOut
 		});
-		TweenMax.to(this.uniforms.colorAdd, .5, {
+		TweenMax.to(That.uniforms.colorAdd, .5, {
 			value: 1.1,
 			delay: .5,
 		});
 
 
 
-
-
 		///emoji sing
-		if (this.emoji) this.emoji.sing();
+		if (That.emoji) That.emoji.sing();
 
 	}
 

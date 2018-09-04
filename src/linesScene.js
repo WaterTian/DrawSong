@@ -547,8 +547,10 @@ class linesScene {
 				// 识别出
 				if (result.Score > 2) {
 					That.curLine.audioName = result.Name;
-					That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
-					That.curLine.addEmoji();
+					
+					/// 是否当节课的字母 否则播base 不添加表情
+					let _playAble = That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
+					if (_playAble) That.curLine.addEmoji();
 				}
 				// 未识别出
 				else {

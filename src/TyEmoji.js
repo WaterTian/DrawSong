@@ -87,13 +87,13 @@ class TyEmoji extends THREE.Object3D {
 
 		setTimeout(()=>{
 			That.mouth.setMap(That.mouthTexs[_frameNum+1]);
-		}, 260);
+		}, 360);
 		setTimeout(()=>{
 			That.mouth.setMap(That.mouthTexs[_frameNum+2]);
-		}, 320);
+		}, 420);
 		setTimeout(() => {
 			That.remove(That.mouth);
-		}, 380);
+		}, 480);
 
 
 		That.isSing = true;
@@ -104,7 +104,7 @@ class TyEmoji extends THREE.Object3D {
 			That.isSing = false;
 			That.eyeL.setMap(That.eyeLTexs[0]);
 			That.eyeR.setMap(That.eyeRTexs[0]);
-		}, 300);
+		}, 480);
 	}
 
 

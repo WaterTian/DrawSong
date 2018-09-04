@@ -46,9 +46,9 @@ void main() {
     vec2 prevP = fix( prevPos, aspect );
     vec2 nextP = fix( nextPos, aspect );
 	float pixelWidth = finalPosition.w * pixelWidthRatio;
-    float w = 0.2 * pixelWidth * width;
+    float w = 0.15 * pixelWidth * width;
 
-    w += sin(counters * wobble + time*0.1) * width * wobble;
+    w += sin(counters * wobble + time*0.2) * width * wobble;
 
 
     vec2 dir;
