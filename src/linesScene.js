@@ -563,8 +563,7 @@ class linesScene {
 		}
 
 
-		// That.curLine.shake();
-		That.curLine.smoothLine();
+		That.curLine.shake();
 
 		if (That.lines.length > maxLinesNum) {
 
@@ -598,7 +597,7 @@ class linesScene {
 
 		if (this.lines) {
 			this.lines.forEach(function(l, i) {
-				l.updateWidth(time);
+				l.update(time);
 			});
 		}
 

@@ -11,10 +11,12 @@ attribute float counters;
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
 uniform vec2 resolution;
-uniform float lineWidth;
+
 uniform vec3 color;
 uniform float opacity;
 uniform float time;
+uniform float wobble;
+
 
 varying vec2 vUV;
 varying vec4 vColor;
@@ -46,7 +48,7 @@ void main() {
 	float pixelWidth = finalPosition.w * pixelWidthRatio;
     float w = 0.2 * pixelWidth * width;
 
-    w *= sin(counters*10.+time*0.1);
+    w += sin(counters * wobble + time*0.1) * width * wobble;
 
 
     vec2 dir;
