@@ -146,36 +146,7 @@ class TyMeshLine extends THREE.Mesh {
 		this.processGeometry(this.getTaperFunction(_type));
 
 
-
-        // console.log(this.geometry);
-		// this.geometry.vertices = this.smoothLine(this.geometry.vertices);
-
 	}
-
-    ///////
-    smoothLine(oldVerts) {
-        var newVerts = [];
-        oldVerts.forEach(function(v, i) {
-            newVerts.push(v);
-            if (i == oldVerts.length - 1) {
-                return true;
-            }
-            var point0 = oldVerts[i === 0 ? i : i - 1];
-            var point1 = v;
-            var point2 = oldVerts[i > oldVerts.length - 2 ? oldVerts.length - 1 : i + 1];
-            var point3 = oldVerts[i > oldVerts.length - 3 ? oldVerts.length - 1 : i + 2];
-            var distance = point1.distanceTo(point2);
-            var segments = Math.floor(distance / _smoothDistance);
-            for (var i = 1; i < segments; i++) {
-                var weight = i / segments;
-                newVerts.push(new THREE.Vector3(THREE.CurveUtils.interpolate(point0.x, point1.x, point2.x, point3.x, weight),THREE.CurveUtils.interpolate(point0.y, point1.y, point2.y, point3.y, weight),0));
-                newVerts[newVerts.length - 1].velocity = point1.velocity * (1 - weight) + point2.velocity * weight
-            }
-            return true;
-        });
-        return newVerts
-    }
-
 
     ///////////
     ///
@@ -231,7 +202,6 @@ class TyMeshLine extends THREE.Mesh {
 	updateWidth(_time) {
 		this.uniforms.lineWidth.value = this.lineWidth * (1 + .15 * Math.sin(.002 * _time + this.random * 10));
 	}
-
 
 	processGeometry(_Taper) {
 
@@ -298,8 +268,6 @@ class TyMeshLine extends THREE.Mesh {
 			this.indices_array.push(n, n + 1, n + 2);
 			this.indices_array.push(n + 2, n + 1, n + 3);
 		}
-
-
 
 
 		this.attributes = {

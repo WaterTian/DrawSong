@@ -113,7 +113,7 @@ class TyEmoji extends THREE.Object3D {
 
 		That.blinkId = setTimeout(function() {
 			That.blink(That);
-		}, 4000 + Math.random() * 6000);
+		}, 4000 + Math.random() * 4000);
 
 		let _part = Math.floor(Math.random() * 2) + 1;
 
