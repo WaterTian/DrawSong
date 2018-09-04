@@ -338,7 +338,6 @@ class linesScene {
 
 
 
-
 		// this.curPoints = [0, 0, 0, -cw / 2, 0, 0, -cw / 2, ch / 2, 0, 0, ch / 2, 0, 0, 0, 0];
 		// this.addLine();
 		// this.addPoint();
@@ -403,6 +402,9 @@ class linesScene {
 			var x = e.clientX / cw * 2 - 1;
 			var y = -e.clientY / ch * 2 + 1;
 
+			var difx = x - prevX,
+				dify = y - prevY;
+
 			if (That.curPoints.length > maxPoints) {
 				That.curPoints.shift();
 				That.curPoints.shift();
@@ -416,12 +418,42 @@ class linesScene {
 			var intersects = That.raycaster.intersectObject(That.raycasterPlane);
 
 			if (intersects.length > 0) {
+
 				// console.log(intersects[0].point);
-				That.curPoints.push(intersects[0].point.x, intersects[0].point.y, 0);
-				That.addPoint(That.curPoints);
+
+				var distance = Math.sqrt(difx * difx + dify * dify);
+
+				if (distance > 10) {
+					That.curPoints.push(intersects[0].point.x, intersects[0].point.y, 0);
+					prevX = x;
+					prevY = y;
+					That.addPoint(That.curPoints);
+				}
 			}
 
 		}
+	}
+
+
+	if (_isDown) {
+		var r = e.target.getClientRects()[0];
+		var x = e.offsetX || (e.clientX - (r.x || r.left));
+		var y = e.offsetY || (e.clientY - (r.y || r.top));
+
+		var difx = x - prevX,
+			dify = y - prevY;
+
+		var d = Math.sqrt(difx * difx + dify * dify);
+		if (d > 10) {
+			// if (That.curPoints.length > maxPoints) {
+			// 	That.curPoints.shift();
+			// }
+
+			That.curPoints.push(x - window.innerWidth / 2, window.innerHeight / 2 - y, 0);
+			prevX = x;
+			prevY = y;
+		}
+		That.addPoint();
 	}
 
 
@@ -576,7 +608,6 @@ class linesScene {
 		}
 
 	}
-
 
 
 
