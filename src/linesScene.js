@@ -338,7 +338,6 @@ class linesScene {
 
 
 
-
 		// this.curPoints = [0, 0, 0, -cw / 2, 0, 0, -cw / 2, ch / 2, 0, 0, ch / 2, 0, 0, 0, 0];
 		// this.addLine();
 		// this.addPoint();
@@ -425,10 +424,11 @@ class linesScene {
 	}
 
 
+
 	addLine() {
 
 		let _color = colors[Math.floor(Math.random() * colors.length)];
-		let line = new TyMeshLine(64, _color);
+		let line = new TyMeshLine(_color);
 
 		That.linesObj.add(line);
 		That.lines.push(line);
@@ -436,8 +436,6 @@ class linesScene {
 
 		line.uniforms.useMap.value = 1;
 		line.uniforms.map.value = lineTexture;
-
-		line.uniforms.sizeAttenuation.value = 1;
 
 		// line.uniforms.repeat.value = new THREE.Vector2(1, 1);
 	}
@@ -549,8 +547,10 @@ class linesScene {
 				// 识别出
 				if (result.Score > 2) {
 					That.curLine.audioName = result.Name;
-					That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
-					That.curLine.addEmoji();
+					
+					/// 是否当节课的字母 否则播base 不添加表情
+					let _playAble = That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
+					if (_playAble) That.curLine.addEmoji();
 				}
 				// 未识别出
 				else {
@@ -579,7 +579,6 @@ class linesScene {
 
 
 
-
 	animate() {
 		let newTime = Date.now();
 		requestAnimationFrame(this.animate.bind(this));
@@ -600,7 +599,7 @@ class linesScene {
 
 		if (this.lines) {
 			this.lines.forEach(function(l, i) {
-				l.updateWidth(time);
+				l.update(time);
 			});
 		}
 

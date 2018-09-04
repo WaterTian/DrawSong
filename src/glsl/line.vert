@@ -11,10 +11,12 @@ attribute float counters;
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
 uniform vec2 resolution;
-uniform float lineWidth;
+
 uniform vec3 color;
 uniform float opacity;
-uniform float sizeAttenuation;
+uniform float time;
+uniform float wobble;
+
 
 varying vec2 vUV;
 varying vec4 vColor;
@@ -44,11 +46,9 @@ void main() {
     vec2 prevP = fix( prevPos, aspect );
     vec2 nextP = fix( nextPos, aspect );
 	float pixelWidth = finalPosition.w * pixelWidthRatio;
-    float w = 1.8 * pixelWidth * lineWidth * width;
+    float w = 0.15 * pixelWidth * width;
 
-    if( sizeAttenuation == 1. ) {
-        w = lineWidth * width;
-    }
+    w += sin(counters * wobble + time*0.2) * width * wobble;
 
 
     vec2 dir;

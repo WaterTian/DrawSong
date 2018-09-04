@@ -71,10 +71,11 @@ class TyAudio {
 		if (num >= 0) {
 			this.players[num][detune].start();
 			console.log("paly " + num + "_" + detune);
+			return true;
 		}else{
 			console.log("none audio paly base");
-
 			That.playBase(detune);
+			return false;
 		}
 	}
 

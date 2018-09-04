@@ -8,11 +8,10 @@ let That;
 class TyMeshLine extends THREE.Mesh {
 
 	///_type :none / linear / parabolic / wavy 
-	constructor(_width = 10, _color = 0x000000) {
+	constructor(_color = 0x000000) {
 		super();
 		That = this;
 
-		this.lineWidth = _width;
 		this.lineColor = _color;
 		this.random = Math.random();
 		this.order = null; //播放顺序
@@ -37,9 +36,13 @@ class TyMeshLine extends THREE.Mesh {
 		//shader
 
 		this.uniforms = {
-			lineWidth: {
+			time: {
 				type: 'f',
-				value: this.lineWidth
+				value: 0.0
+			},
+			wobble: {
+				type: 'f',
+				value: 0.0
 			},
 			map: {
 				type: 't',
@@ -47,7 +50,7 @@ class TyMeshLine extends THREE.Mesh {
 			},
 			useMap: {
 				type: 'f',
-				value: 0
+				value: 0.0
 			},
 			alphaMap: {
 				type: 't',
@@ -55,7 +58,7 @@ class TyMeshLine extends THREE.Mesh {
 			},
 			useAlphaMap: {
 				type: 'f',
-				value: 0
+				value: 0.0
 			},
 			color: {
 				type: 'c',
@@ -63,19 +66,15 @@ class TyMeshLine extends THREE.Mesh {
 			},
 			opacity: {
 				type: 'f',
-				value: 1
+				value: 1.0
 			},
 			resolution: {
 				type: 'v2',
 				value: new THREE.Vector2(1, 1)
 			},
-			sizeAttenuation: {
-				type: 'f',
-				value: 0
-			},
 			visibility: {
 				type: 'f',
-				value: 1
+				value: 1.0
 			},
 			alphaTest: {
 				type: 'f',
@@ -97,7 +96,6 @@ class TyMeshLine extends THREE.Mesh {
 			uniforms: this.uniforms,
 			vertexShader: glslify('./glsl/line.vert'),
 			fragmentShader: glslify('./glsl/line.frag'),
-
 			transparent: true,
 			side: THREE.DoubleSide,
 			// wireframe: true,
@@ -145,8 +143,8 @@ class TyMeshLine extends THREE.Mesh {
 
 		this.processGeometry(this.getTaperFunction(_type));
 
-
 	}
+
 
     ///////////
     ///
@@ -154,7 +152,7 @@ class TyMeshLine extends THREE.Mesh {
 		this.emoji = new TyEmoji(That.lineColor);
 		this.add(this.emoji);
 		this.emoji.position.x = That.center[0];
-		this.emoji.position.y =  That.center[1];
+		this.emoji.position.y = That.center[1];
 
 	}
 
@@ -171,36 +169,68 @@ class TyMeshLine extends THREE.Mesh {
 		});
 
 		///remove emoji
-		if(this.emoji) this.remove(this.emoji);
+		if (this.emoji) this.remove(this.emoji);
 	}
 
 	shake() {
-		TweenMax.to(this.position, .5, {
-			z: 50,
+		let That = this;
+
+		TweenMax.to(That.position, .5, {
+			x: -That.center[0]/4,
+			y: -That.center[1]/4,
+			z: 300,
 			ease: Elastic.easeOut
 		});
-		TweenMax.to(this.position, 1, {
+		TweenMax.to(That.position, 1, {
+			x: 0,
+			y: 0,
 			z: 0,
-			delay: .6,
+			delay: .5,
+			ease: Linear.easeNone
+		});
+		// TweenMax.to(That.scale, .5, {
+		// 	x: 1.25,
+		// 	y: 1.25,
+		// 	ease: Elastic.easeOut
+		// });
+		// TweenMax.to(That.scale, 1, {
+		// 	x: 1,
+		// 	y: 1,
+		// 	delay: .5,
+		// 	ease: Linear.easeNone
+		// });
+
+
+
+		TweenMax.to(That.uniforms.wobble, 0.5, {
+			value: 24,
+			ease: Strong.easeOut
+		});
+		TweenMax.to(That.uniforms.wobble, 1.5, {
+			value: 0,
+			delay: .5,
 			ease: Linear.easeNone
 		});
 
-		TweenMax.to(this.uniforms.colorAdd, .5, {
+
+		TweenMax.to(That.uniforms.colorAdd, .5, {
 			value: 1.36,
 			ease: Elastic.easeOut
 		});
-		TweenMax.to(this.uniforms.colorAdd, .5, {
+		TweenMax.to(That.uniforms.colorAdd, .5, {
 			value: 1.1,
 			delay: .5,
 		});
 
+
+
 		///emoji sing
-		if(this.emoji)this.emoji.sing();
+		if (That.emoji) That.emoji.sing();
 
 	}
 
-	updateWidth(_time) {
-		this.uniforms.lineWidth.value = this.lineWidth * (1 + .15 * Math.sin(.002 * _time + this.random * 10));
+	update(_time) {
+		this.uniforms.time.value ++;
 	}
 
 	processGeometry(_Taper) {
@@ -288,6 +318,7 @@ class TyMeshLine extends THREE.Mesh {
 		this.geometry.addAttribute('width', this.attributes.width);
 		this.geometry.addAttribute('uv', this.attributes.uv);
 		this.geometry.addAttribute('counters', this.attributes.counters);
+
 
 		this.geometry.setIndex(this.attributes.index);
 	}
