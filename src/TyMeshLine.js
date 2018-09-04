@@ -116,6 +116,7 @@ class TyMeshLine extends THREE.Mesh {
 
 		if (_points instanceof Float32Array || _points instanceof Array) {
 			for (var j = 0; j < _points.length; j += 3) {
+
 				var c = j / _points.length;
 				this.positions.push(_points[j], _points[j + 1], _points[j + 2]);
 				this.positions.push(_points[j], _points[j + 1], _points[j + 2]);
@@ -147,15 +148,14 @@ class TyMeshLine extends THREE.Mesh {
 
 
 
-        // console.log(this.geometry);
-		// this.geometry.vertices = this.smoothLine(this.geometry.vertices);
+		this.positions = this.smoothLine(this.positions);
 
 	}
 
     ///////
     smoothLine(oldVerts) {
         var newVerts = [];
-        oldVerts.forEach(function(v, i) {
+        oldVerts.every(function(v, i) {
             newVerts.push(v);
             if (i == oldVerts.length - 1) {
                 return true;
