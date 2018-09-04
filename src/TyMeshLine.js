@@ -97,7 +97,6 @@ class TyMeshLine extends THREE.Mesh {
 			uniforms: this.uniforms,
 			vertexShader: glslify('./glsl/line.vert'),
 			fragmentShader: glslify('./glsl/line.frag'),
-
 			transparent: true,
 			side: THREE.DoubleSide,
 			// wireframe: true,
@@ -146,44 +145,15 @@ class TyMeshLine extends THREE.Mesh {
 
 		this.processGeometry(this.getTaperFunction(_type));
 
-
-
-		this.positions = this.smoothLine(this.positions);
-
 	}
 
-    ///////
-    smoothLine(oldVerts) {
-        var newVerts = [];
-        oldVerts.every(function(v, i) {
-            newVerts.push(v);
-            if (i == oldVerts.length - 1) {
-                return true;
-            }
-            var point0 = oldVerts[i === 0 ? i : i - 1];
-            var point1 = v;
-            var point2 = oldVerts[i > oldVerts.length - 2 ? oldVerts.length - 1 : i + 1];
-            var point3 = oldVerts[i > oldVerts.length - 3 ? oldVerts.length - 1 : i + 2];
-            var distance = point1.distanceTo(point2);
-            var segments = Math.floor(distance / _smoothDistance);
-            for (var i = 1; i < segments; i++) {
-                var weight = i / segments;
-                newVerts.push(new THREE.Vector3(THREE.CurveUtils.interpolate(point0.x, point1.x, point2.x, point3.x, weight),THREE.CurveUtils.interpolate(point0.y, point1.y, point2.y, point3.y, weight),0));
-                newVerts[newVerts.length - 1].velocity = point1.velocity * (1 - weight) + point2.velocity * weight
-            }
-            return true;
-        });
-        return newVerts
-    }
-
-
-    ///////////
-    ///
+	///////////
+	///
 	addEmoji() {
 		this.emoji = new TyEmoji(That.lineColor);
 		this.add(this.emoji);
 		this.emoji.position.x = That.center[0];
-		this.emoji.position.y =  That.center[1];
+		this.emoji.position.y = That.center[1];
 
 	}
 
@@ -200,7 +170,7 @@ class TyMeshLine extends THREE.Mesh {
 		});
 
 		///remove emoji
-		if(this.emoji) this.remove(this.emoji);
+		if (this.emoji) this.remove(this.emoji);
 	}
 
 	shake() {
@@ -224,12 +194,47 @@ class TyMeshLine extends THREE.Mesh {
 		});
 
 		///emoji sing
-		if(this.emoji)this.emoji.sing();
+		if (this.emoji) this.emoji.sing();
 
 	}
 
 	updateWidth(_time) {
 		this.uniforms.lineWidth.value = this.lineWidth * (1 + .15 * Math.sin(.002 * _time + this.random * 10));
+	}
+
+
+
+	///////
+	smoothLine(oldVerts) {
+		var newVerts = [];
+		oldVerts.every(function(v, i) {
+			newVerts.push(v);
+			if (i == oldVerts.length - 1) {
+				return true;
+			}
+			var point0 = oldVerts[i === 0 ? i : i - 1];
+			var point1 = v;
+			var point2 = oldVerts[i > oldVerts.length - 2 ? oldVerts.length - 1 : i + 1];
+			var point3 = oldVerts[i > oldVerts.length - 3 ? oldVerts.length - 1 : i + 2];
+			var distance = distancePoint(point1, point2);
+			var segments = Math.floor(distance / _smoothDistance);
+			for (var i = 1; i < segments; i++) {
+				var weight = i / segments;
+				newVerts.push(new THREE.Vector3(THREE.CurveUtils.interpolate(point0.x, point1.x, point2.x, point3.x, weight), THREE.CurveUtils.interpolate(point0.y, point1.y, point2.y, point3.y, weight), 0));
+				newVerts[newVerts.length - 1].velocity = point1.velocity * (1 - weight) + point2.velocity * weight
+			}
+			return true;
+		});
+		return newVerts
+	}
+	distancePoint(v1, v2, noSq) {
+		var dx = v1.x - v2.x;
+		var dy = v1.y - v2.y;
+		var dz = v1.z - v2.z;
+		if (!noSq) {
+			return Math.sqrt(dx * dx + dy * dy + dz * dz)
+		}
+		return dx * dx + dy * dy + dz * dz
 	}
 
 
@@ -298,7 +303,6 @@ class TyMeshLine extends THREE.Mesh {
 			this.indices_array.push(n, n + 1, n + 2);
 			this.indices_array.push(n + 2, n + 1, n + 3);
 		}
-
 
 
 
