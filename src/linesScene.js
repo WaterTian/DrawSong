@@ -428,7 +428,7 @@ class linesScene {
 	addLine() {
 
 		let _color = colors[Math.floor(Math.random() * colors.length)];
-		let line = new TyMeshLine(64, _color);
+		let line = new TyMeshLine(_color);
 
 		That.linesObj.add(line);
 		That.lines.push(line);
@@ -436,8 +436,6 @@ class linesScene {
 
 		line.uniforms.useMap.value = 1;
 		line.uniforms.map.value = lineTexture;
-
-		line.uniforms.sizeAttenuation.value = 1;
 
 		// line.uniforms.repeat.value = new THREE.Vector2(1, 1);
 	}
@@ -565,7 +563,8 @@ class linesScene {
 		}
 
 
-		That.curLine.shake();
+		// That.curLine.shake();
+		That.curLine.smoothLine();
 
 		if (That.lines.length > maxLinesNum) {
 

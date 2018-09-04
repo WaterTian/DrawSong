@@ -14,7 +14,7 @@ uniform vec2 resolution;
 uniform float lineWidth;
 uniform vec3 color;
 uniform float opacity;
-uniform float sizeAttenuation;
+uniform float time;
 
 varying vec2 vUV;
 varying vec4 vColor;
@@ -44,11 +44,9 @@ void main() {
     vec2 prevP = fix( prevPos, aspect );
     vec2 nextP = fix( nextPos, aspect );
 	float pixelWidth = finalPosition.w * pixelWidthRatio;
-    float w = 1.8 * pixelWidth * lineWidth * width;
+    float w = 0.2 * pixelWidth * width;
 
-    if( sizeAttenuation == 1. ) {
-        w = lineWidth * width;
-    }
+    w *= sin(counters*10.+time*0.1);
 
 
     vec2 dir;
