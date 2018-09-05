@@ -8,23 +8,19 @@ import Tone from 'Tone';
 
 
 import TyAudio from './TyAudio';
-import TyMeshLine from './TyMeshLine';
+import TyLine from './TyLine';
 import TyRecognizer from './TyRecognizer';
 import introObject from './introObject';
-
 
 
 const OrbitControls = OrbitContructor(THREE);
 const glslify = require('glslify');
 const Recognizer = new TyRecognizer();
 
-
 const StartAudioContext = require('./StartAudioContext.js');
-
 
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 window.floatType = isMobile ? THREE.HalfFloatType : THREE.FloatType;
-
 
 
 var That;
@@ -34,15 +30,12 @@ var zoom = 0;
 var cw = window.innerWidth;
 var ch = window.innerHeight;
 
-
 var _isDown = false;
 var maxPoints = 256;
 
 var maxLinesNum = isMobile ? 21 : 24;
 
-
 var firstTimeEver = true;
-
 
 var euler = new THREE.Euler();
 var q0 = new THREE.Quaternion();
@@ -51,7 +44,13 @@ var orientationScale = {
 };
 
 
-var colors = [
+var isPlaying = false;
+var curPlayNum = 0;
+var isIntro = false;
+
+
+
+window.colors = [
 	0x4cb151,
 	0x45b4a1,
 	0x4598b6,
@@ -67,28 +66,11 @@ var colors = [
 	0x95c531
 ];
 
-
-var isPlaying = false;
-var curPlayNum = 0;
-
-
-var isIntro = false;
-
-
-
-var lineTexture = new THREE.TextureLoader().load('assets/s.jpg');
+window.lineTexture = new THREE.TextureLoader().load('assets/s.jpg');
 lineTexture.wrapS = THREE.RepeatWrapping;
 lineTexture.wrapT = THREE.RepeatWrapping;
 
-var handTexture = new THREE.TextureLoader().load('assets/hand.png');
-
-
-function Point(x, y) // constructor
-{
-	this.X = x;
-	this.Y = y;
-}
-
+window.handTexture = new THREE.TextureLoader().load('assets/hand.png');
 
 
 class linesScene {
@@ -150,7 +132,6 @@ class linesScene {
 
 
 	init() {
-
 		this.camera;
 		this.scene;
 		this.groundMaterial;
@@ -219,7 +200,6 @@ class linesScene {
 		// if (window.DeviceOrientationEvent) window.addEventListener("deviceorientation", this.onOrientation);
 
 
-
 		time = Date.now();
 		this.animate();
 
@@ -256,14 +236,13 @@ class linesScene {
 
 	/////////////////////////////init
 
-
 	initIntro(_ts, _rNs) {
 
 		isIntro = true;
 
 		That.initLines();
 
-		That.intro = new introObject(handTexture);
+		That.intro = new introObject();
 		That.scene.add(That.intro);
 
 		That.introT = '';
@@ -328,7 +307,6 @@ class linesScene {
 
 	initLines() {
 
-
 		this.lines = [];
 		this.curPoints = [];
 		this.curLine = null;
@@ -336,23 +314,21 @@ class linesScene {
 		this.linesObj = new THREE.Object3D();
 		this.scene.add(this.linesObj);
 
-
-
 		// this.curPoints = [0, 0, 0, -cw / 2, 0, 0, -cw / 2, ch / 2, 0, 0, ch / 2, 0, 0, 0, 0];
 		// this.addLine();
-		// this.addPoint();
+		// this.curLine.setPoints(this.curPoints, "parabolic");
 
 		if (('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0)) {
 			this.renderer.domElement.addEventListener("touchstart", (e) => {
 				e.preventDefault();
 				if (e.stopPropagation) e.stopPropagation();
 				e = e.targetTouches[0];
-				That.down(e);
+				That.drawStart(e);
 			}, false);
 			this.renderer.domElement.addEventListener("touchmove", function(e) {
 				e.preventDefault();
 				if (e.stopPropagation) e.stopPropagation();
-				That.move(e.changedTouches[0]);
+				That.drawMove(e.changedTouches[0]);
 			}, false);
 			this.renderer.domElement.addEventListener("touchend", function(e) {
 				e.preventDefault();
@@ -373,31 +349,35 @@ class linesScene {
 			document.addEventListener("mousedown", function(e) {
 				e.preventDefault();
 				if (e.stopPropagation) e.stopPropagation();
-				That.down(e);
+				That.drawStart(e);
 			}, false);
 			document.addEventListener("mousemove", function(e) {
 				e.preventDefault();
-				That.move(e);
+				That.drawMove(e);
 			}, false);
 		}
 	}
 
 
-
-	down(e) {
+	drawStart(e) {
 		if (firstTimeEver) {
 			// console.log("play 0");
 			// That.tyAudio.play('o');
 			firstTimeEver = false;
 		}
 
+		let _color = colors[Math.floor(Math.random() * colors.length)];
+		let line = new TyLine(_color, lineTexture);
+
+		That.linesObj.add(line);
+		That.lines.push(line);
+		That.curLine = line;
 		That.curPoints = [];
-		That.addLine();
 
 		_isDown = true;
 	}
 
-	move(e) {
+	drawMove(e) {
 		if (_isDown) {
 			var x = e.clientX / cw * 2 - 1;
 			var y = -e.clientY / ch * 2 + 1;
@@ -417,43 +397,17 @@ class linesScene {
 			if (intersects.length > 0) {
 				// console.log(intersects[0].point);
 				That.curPoints.push(intersects[0].point.x, intersects[0].point.y, 0);
-				That.addPoint(That.curPoints);
+				//// addPoint
+				That.curLine.setPoints(That.curPoints, "parabolic");
 			}
 
 		}
 	}
 
-
-
-	addLine() {
-
-		let _color = colors[Math.floor(Math.random() * colors.length)];
-		let line = new TyMeshLine(_color);
-
-		That.linesObj.add(line);
-		That.lines.push(line);
-		That.curLine = line;
-
-		line.uniforms.useMap.value = 1;
-		line.uniforms.map.value = lineTexture;
-
-		// line.uniforms.repeat.value = new THREE.Vector2(1, 1);
-	}
-
-	addPoint(_curPoints) {
-
-		// console.log(this.curLine);
-		// console.log(_curPoints);
-
-		That.curLine.setPoints(_curPoints, "parabolic");
-
-	}
-
-
 	//////////////////////
 	///
 	///
-	///
+	//////////////////////
 	drawEnd() {
 		_isDown = false;
 		console.log("drawEnd");
@@ -466,7 +420,7 @@ class linesScene {
 
 			// linePs.push(That.curPoints[i].toFixed(2));
 			// linePs.push(That.curPoints[i + 1].toFixed(2));
-
+			// 
 			linePs.push(That.curPoints[i]);
 			linePs.push(That.curPoints[i + 1]);
 		}
@@ -547,7 +501,7 @@ class linesScene {
 				// 识别出
 				if (result.Score > 2) {
 					That.curLine.audioName = result.Name;
-					
+
 					/// 是否当节课的字母 否则播base 不添加表情
 					let _playAble = That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
 					if (_playAble) That.curLine.addEmoji();
@@ -565,6 +519,7 @@ class linesScene {
 		}
 
 
+		// 抖动
 		That.curLine.shake();
 
 		if (That.lines.length > maxLinesNum) {
@@ -649,11 +604,9 @@ class linesScene {
 	}
 
 	clearMuisc() {
-
 		isPlaying = false
 		document.getElementById('play').style.display = "block";
 		document.getElementById('pause').style.display = "none";
-
 
 		That.lines.forEach(function(l) {
 			l.removeThis(function(_that) {
@@ -662,13 +615,9 @@ class linesScene {
 		});
 		That.lines = [];
 		curPlayNum = 0;
-
-
-
 	}
 
 	controlMuisc() {
-
 		isPlaying = !isPlaying;
 		if (isPlaying) {
 			console.log("playMuisc");
@@ -682,20 +631,15 @@ class linesScene {
 			document.getElementById('play').style.display = "block";
 			document.getElementById('pause').style.display = "none";
 		}
-
 	}
 
 	musicLoop() {
 		if (!isPlaying) return;
-
 		console.log("musicLoop " + curPlayNum);
-
-		let useT = !document.getElementById('useT').checked
+		let useT = !document.getElementById('useT').checked;
 
 		That.lines.forEach(function(l, i) {
-
 			if (l.order == curPlayNum) {
-
 				if (useT) {
 					if (l.audioName) That.tyAudio.play(l.audioName, l.detune);
 					else That.tyAudio.playBase(l.detune);
@@ -703,21 +647,16 @@ class linesScene {
 					if (l.audioName) That.tyAudio.playMarimba(l.detune);
 					else That.tyAudio.playBase(l.detune);
 				}
-
 				l.shake();
 			}
 		});
-
-
 		curPlayNum++;
 		if (curPlayNum > 11) curPlayNum = 0;
+
 		setTimeout(function() {
 			That.musicLoop();
 		}, 200);
-
 	}
-
-
 
 }
 

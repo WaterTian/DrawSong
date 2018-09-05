@@ -2,31 +2,14 @@ import * as THREE from 'three';
 import TweenMax from "gsap";
 const glslify = require('glslify');
 import TyCard from './TyCard';
-import TyMeshLine from './TyMeshLine';
+import TyLine from './TyLine';
 import fireworks from './fireworks';
-
-
-var colors = [
-	0x4cb151,
-	0x45b4a1,
-	0x4598b6,
-	0x4e61d9,
-	0x8065c6,
-	0xa541b1,
-	0xed3983,
-	0xf7583a,
-	0xf7933d,
-	0xf6be37,
-	0xf6be37,
-	0xd1c12e,
-	0x95c531
-];
 
 
 let That;
 class introObject extends THREE.Object3D {
 
-	constructor(handTexture = null) {
+	constructor() {
 		super();
 		That = this;
 
@@ -48,7 +31,6 @@ class introObject extends THREE.Object3D {
 		this.fw = new fireworks();
 		this.add(this.fw);
 
-
 	}
 
 	moveHand(_x, _y) {
@@ -57,27 +39,18 @@ class introObject extends THREE.Object3D {
 
 	}
 
-
 	drawT(_ps, callback) {
 
 		let curPoints = [];
 		let _num = 0;
 
 		let _color = colors[Math.floor(Math.random() * colors.length)];
-		let line = new TyMeshLine(64, _color);
+		let line = new TyLine(_color,lineTexture);
+
 		this.add(line);
-
-		var texture = new THREE.TextureLoader().load('assets/s.jpg');
-		texture.wrapS = THREE.RepeatWrapping;
-		texture.wrapT = THREE.RepeatWrapping;
-		line.uniforms.useMap.value = 1;
-		line.uniforms.map.value = texture;
-		line.uniforms.sizeAttenuation.value = 1;
-
 		this.curLine = line;
 
 		That.hand.show();
-
 
 		draw();
 
@@ -89,8 +62,6 @@ class introObject extends THREE.Object3D {
 				That.hand.hide();
 				///
 				line.addEmoji();
-
-
 				return;
 			}
 
@@ -101,8 +72,6 @@ class introObject extends THREE.Object3D {
 			line.setPoints(curPoints, "parabolic");
 
 			That.moveHand(_x, _y);
-
-
 			_num += 2;
 			setTimeout(draw, 20);
 		}
@@ -116,7 +85,6 @@ class introObject extends THREE.Object3D {
 		}
 		That.curLine.removeThis(function(_that) {
 			That.remove(_that);
-
 			if (callback) callback();
 		});
 
@@ -137,9 +105,6 @@ class introObject extends THREE.Object3D {
 				That.remove(That.fw);
 			})
 		}
-
-
-
 	}
 
 }
