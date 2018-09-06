@@ -141,14 +141,11 @@ class TyLine extends THREE.Object3D {
 
 
 	removeThis(callback) {
-		TweenMax.to(this.lineMesh.uniforms.visibility, .3, {
+		TweenMax.to(this.lineMesh.uniforms.visibility, .4, {
 			value: 0,
 			onComplete: function() {
 				callback(That);
 			}
-		});
-		TweenMax.to(this.position, .3, {
-			z: -300
 		});
 
 		///remove emoji

@@ -165,7 +165,8 @@ class linesScene {
 		// init renderer
 		this.renderer = new THREE.WebGLRenderer({
 			antialias: true,
-			// alpha: true
+			// alpha: true,
+			preserveDrawingBuffer: true,
 		});
 
 		console.log(window.devicePixelRatio);
@@ -257,7 +258,7 @@ class linesScene {
 	}
 
 	initIntro1() {
-		That.clearMuisc();
+		That.clearAllMuisc();
 		let _ps = Recognizer.Unistrokes[That.intro.RecognizerNums[0]];
 		let _nt = That.intro.TS[0];
 
@@ -270,7 +271,7 @@ class linesScene {
 
 	}
 	initIntro2() {
-		That.clearMuisc();
+		That.clearAllMuisc();
 		let _ps = Recognizer.Unistrokes[That.intro.RecognizerNums[1]];
 		let _nt = That.intro.TS[1];
 
@@ -282,7 +283,7 @@ class linesScene {
 		});
 	}
 	initIntro3() {
-		That.clearMuisc();
+		That.clearAllMuisc();
 		let _ps = Recognizer.Unistrokes[That.intro.RecognizerNums[2]];
 		let _nt = That.intro.TS[2];
 
@@ -295,7 +296,7 @@ class linesScene {
 	}
 	removeIntro() {
 		isIntro = false;
-		That.clearMuisc();
+		That.clearAllMuisc();
 		That.intro.clearT(function() {
 			That.intro.removeThis();
 		});
@@ -562,7 +563,7 @@ class linesScene {
 		if (this.intro) this.intro.update(dt);
 		if (this.tyAudio) this.tyAudio.update();
 
-
+		this.renderer.clear();
 		this.renderer.render(this.scene, this.camera);
 
 		if (this.composer) {
@@ -594,7 +595,7 @@ class linesScene {
 		let undoBtn = document.getElementById('UndoBtn');
 		undoBtn.addEventListener('touchmove', EventPreventDefault);
 		undoBtn.addEventListener('mousemove', EventPreventDefault);
-		undoBtn.addEventListener('click', this.clearMuisc);
+		undoBtn.addEventListener('click', this.undoMuisc);
 
 
 
@@ -603,7 +604,20 @@ class linesScene {
 		}
 	}
 
-	clearMuisc() {
+	undoMuisc() {
+		isPlaying = false
+		document.getElementById('play').style.display = "block";
+		document.getElementById('pause').style.display = "none";
+
+		if (That.lines.length < 1) return;
+		That.lines[That.lines.length - 1].removeThis(function(_that) {
+			That.linesObj.remove(_that);
+		});
+		That.lines.pop();
+		curPlayNum = 0;
+	}
+
+	clearAllMuisc() {
 		isPlaying = false
 		document.getElementById('play').style.display = "block";
 		document.getElementById('pause').style.display = "none";
