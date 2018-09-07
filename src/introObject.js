@@ -40,13 +40,10 @@ class introObject extends THREE.Object3D {
 	}
 
 	drawT(_ps, callback) {
-
-		let curPoints = [];
 		let _num = 0;
 
 		let _color = colors[Math.floor(Math.random() * colors.length)];
-		let line = new TyLine(_color,lineTexture);
-
+		let line = new TyLine(_color, lineTexture, "parabolic");
 		this.add(line);
 		this.curLine = line;
 
@@ -56,8 +53,9 @@ class introObject extends THREE.Object3D {
 
 		function draw() {
 			if (_num >= _ps._Points.length) {
-
 				callback();
+				
+				line.smoothPoints();
 				line.shake();
 				That.hand.hide();
 				///
@@ -65,13 +63,10 @@ class introObject extends THREE.Object3D {
 				return;
 			}
 
-			let _x = _ps._Points[_num];
-			let _y = _ps._Points[_num + 1];
+			let _p = new THREE.Vector3(_ps._Points[_num], _ps._Points[_num + 1], 0)
+			line.addPoint(_p);
 
-			curPoints.push(_x, _y, 0);
-			line.setPoints(curPoints, "parabolic");
-
-			That.moveHand(_x, _y);
+			That.moveHand(_p.x, _p.y);
 			_num += 2;
 			setTimeout(draw, 20);
 		}

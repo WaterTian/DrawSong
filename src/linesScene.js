@@ -241,8 +241,6 @@ class linesScene {
 
 		isIntro = true;
 
-		That.initLines();
-
 		That.intro = new introObject();
 		That.scene.add(That.intro);
 
@@ -252,6 +250,7 @@ class linesScene {
 		That.intro.RecognizerNums = _rNs;
 
 
+		That.initLine();
 		/////////////////////////////////// skip
 		// That.initIntro1();
 		That.removeIntro();
@@ -306,19 +305,16 @@ class linesScene {
 	}
 
 
-	initLines() {
+	initLine() {
 
 		this.lines = [];
-		this.curPoints = [];
 		this.curLine = null;
-
 		this.linesObj = new THREE.Object3D();
 		this.scene.add(this.linesObj);
 
-		// this.curPoints = [0, 0, 0, -cw / 2, 0, 0, -cw / 2, ch / 2, 0, 0, ch / 2, 0, 0, 0, 0];
+		// let curPoints = [0, 0, 0, -cw / 2, 0, 0, -cw / 2, ch / 2, 0, 0, ch / 2, 0, 0, 0, 0];
 		// this.addLine();
-		// this.curLine.setPoints(this.curPoints, "parabolic");
-
+		// this.curLine.setPoints(curPoints);
 		if (('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0)) {
 			this.renderer.domElement.addEventListener("touchstart", (e) => {
 				e.preventDefault();
@@ -362,18 +358,15 @@ class linesScene {
 
 	drawStart(e) {
 		if (firstTimeEver) {
-			// console.log("play 0");
-			// That.tyAudio.play('o');
 			firstTimeEver = false;
 		}
 
 		let _color = colors[Math.floor(Math.random() * colors.length)];
-		let line = new TyLine(_color, lineTexture);
-
+		//////
+		let line = new TyLine(_color, lineTexture, "parabolic");
 		That.linesObj.add(line);
 		That.lines.push(line);
 		That.curLine = line;
-		That.curPoints = [];
 
 		_isDown = true;
 	}
@@ -382,26 +375,15 @@ class linesScene {
 		if (_isDown) {
 			var x = e.clientX / cw * 2 - 1;
 			var y = -e.clientY / ch * 2 + 1;
-
-			if (That.curPoints.length > maxPoints) {
-				That.curPoints.shift();
-				That.curPoints.shift();
-				That.curPoints.shift();
-			}
-
 			var mouse = new THREE.Vector2(x, y);
-
 			That.raycaster.setFromCamera(mouse, That.camera);
 
 			var intersects = That.raycaster.intersectObject(That.raycasterPlane);
-
 			if (intersects.length > 0) {
 				// console.log(intersects[0].point);
-				That.curPoints.push(intersects[0].point.x, intersects[0].point.y, 0);
-				//// addPoint
-				That.curLine.setPoints(That.curPoints, "parabolic");
+				// addPoint
+				That.curLine.addPoint(intersects[0].point);
 			}
-
 		}
 	}
 
@@ -413,21 +395,13 @@ class linesScene {
 		_isDown = false;
 		console.log("drawEnd");
 
-		if (That.curPoints.length == 0) return;
-
+		if (That.curLine.points.length == 0) return;
 
 		var linePs = [];
-		for (var i = 0; i < That.curPoints.length; i += 3) {
-
-			// linePs.push(That.curPoints[i].toFixed(2));
-			// linePs.push(That.curPoints[i + 1].toFixed(2));
-			// 
-			linePs.push(That.curPoints[i]);
-			linePs.push(That.curPoints[i + 1]);
+		for (var i = 0; i < That.curLine.points.length; i += 3) {
+			linePs.push(That.curLine.points[i].x);
+			linePs.push(That.curLine.points[i].y);
 		}
-
-		//.toFixed(2);
-		// console.log(linePs.toString());
 
 		var result = Recognizer.Recognize(linePs, true);
 		console.log(result);
@@ -443,11 +417,13 @@ class linesScene {
 		if (That.curLine.order > 12) That.curLine.order = 12;
 		That.curLine.order--;
 
-		// console.log("detune " + That.curLine.detune);
 		console.log("order " + That.curLine.order);
 
-
 		let useT = !document.getElementById('useT').checked;
+
+		/////
+		That.curLine.smoothPoints();
+
 
 		// Intro 
 		if (isIntro) {
@@ -573,7 +549,8 @@ class linesScene {
 	}
 
 
-
+	/////////// UI Bar
+	///
 	initUI() {
 
 		let BtnContainer = document.getElementById('BtnContainer');

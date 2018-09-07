@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import TweenMax from "gsap";
 const glslify = require('glslify');
-
 import TyLineMesh from './TyLineMesh';
 import TyEmoji from './TyEmoji';
 
@@ -10,15 +9,20 @@ import TyEmoji from './TyEmoji';
 let That;
 class TyLine extends THREE.Object3D {
 
-	constructor(_color = 0x000000, _lineTexture = null) {
+	constructor(_color = 0x000000, _lineTexture = null, _type = 'none') {
 		super();
 		That = this;
 
 		this.lineColor = _color;
+		this.type = _type; //_type :none / linear / parabolic / wavy 
+
 		this.order = null; //播放顺序
 		this.detune = 0; //音高
 		this.audioName = null; //字母
 		this.center = []; //中心点
+
+		this.points = []; //构成线的点们
+		this.maxPoints = 256; //点上限数
 
 
 		this.lineMesh = new TyLineMesh();
@@ -37,46 +41,53 @@ class TyLine extends THREE.Object3D {
 		this.emoji.position.y = this.center[1];
 	}
 
-	
+	//////////////
+	addPoint(_v3) {
+		if (this.points.length > this.maxPoints) this.points.shift();
+		this.points.push(_v3);
+		this.setPoints(this.points);
+	}
 
-	setPoints(_points = [], _type = 'none') {
 
+	setPoints(_points) {
 		this.lineMesh.positions = [];
 		this.lineMesh.counters = [];
 
-		var minX, minY, maxX, maxY;
+		let minX, minY, maxX, maxY;
+		for (let j = 0; j < _points.length; j++) {
 
-		if (_points instanceof Float32Array || _points instanceof Array) {
-			for (var j = 0; j < _points.length; j += 3) {
-				var c = j / _points.length;
-				this.lineMesh.positions.push(_points[j], _points[j + 1], _points[j + 2]);
-				this.lineMesh.positions.push(_points[j], _points[j + 1], _points[j + 2]);
-				this.lineMesh.counters.push(c);
-				this.lineMesh.counters.push(c);
+			let c = j / _points.length;
+			let _x = _points[j].x;
+			let _y = _points[j].y;
+			let _z = _points[j].z;
 
-				//tyadd
-				if (j == 0) {
-					minX = maxX = _points[j];
-					minY = maxY = _points[j + 1];
-				} else {
-					if (_points[j] < minX) minX = _points[j];
-					if (_points[j + 1] < minY) minY = _points[j + 1];
+			this.lineMesh.positions.push(_x, _y, _z);
+			this.lineMesh.positions.push(_x, _y, _z);
+			this.lineMesh.counters.push(c);
+			this.lineMesh.counters.push(c);
 
-					if (_points[j] > maxX) maxX = _points[j];
-					if (_points[j + 1] > maxY) maxY = _points[j + 1];
-				}
+			//tyadd  get min/max point
+			if (j == 0) {
+				minX = maxX = _x;
+				minY = maxY = _y;
+			} else {
+				if (_x < minX) minX = _x;
+				if (_y < minY) minY = _y;
+				if (_x > maxX) maxX = _x;
+				if (_y > maxY) maxY = _y;
 			}
-
-			var cx = minX + (maxX - minX) / 2;
-			var cy = minY + (maxY - minY) / 2;
-			this.center = [cx, cy];
-
-		} else {
-			console.log("input points with Float32Array or Array");
 		}
 
-		this.lineMesh.processGeometry(this.lineMesh.getTaperFunction(_type));
+		let cx = minX + (maxX - minX) / 2;
+		let cy = minY + (maxY - minY) / 2;
+		this.center = [cx, cy];
+		this.lineMesh.processGeometry(this.lineMesh.getTaperFunction(this.type));
+	}
 
+	smoothPoints() {
+		let _curve = new THREE.SplineCurve3(this.points);
+		this.points = _curve.getPoints(250);
+		this.setPoints(this.points);
 	}
 
 
@@ -84,9 +95,9 @@ class TyLine extends THREE.Object3D {
 		let That = this;
 
 		TweenMax.to(That.position, .5, {
-			x: -That.center[0]/4,
-			y: -That.center[1]/4,
-			z: 300,
+			x: -That.center[0] / 5,
+			y: -That.center[1] / 5,
+			z: 200,
 			ease: Elastic.easeOut
 		});
 		TweenMax.to(That.position, 1, {
@@ -136,7 +147,7 @@ class TyLine extends THREE.Object3D {
 
 
 	update(_time) {
-		this.lineMesh.uniforms.time.value ++;
+		this.lineMesh.uniforms.time.value++;
 	}
 
 
