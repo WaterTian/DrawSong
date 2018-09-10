@@ -140,27 +140,6 @@ class linesScene {
 
 		this.scene = new THREE.Scene();
 
-		this.camera0 = new THREE.PerspectiveCamera(60, cw / ch, 1, 20000);
-		this.camera0.position.set(0, 0, 1000);
-		this.scene.add(this.camera0);
-
-
-		this.camera1 = new THREE.PerspectiveCamera(40, cw / ch, 1, 1500);
-		this.camera1.position.set(0, 0, 1000);
-		this.scene.add(this.camera1);
-		var helper1 = new THREE.CameraHelper(this.camera1);
-		// this.scene.add(helper1);
-
-
-		// this.camera2 = new THREE.OrthographicCamera( cw / - 2, cw / 2, ch / 2, ch / - 2, 1, 2000 );
-		// this.camera2.position.set(0, 0, 1000);
-		// this.scene.add(this.camera2);
-		// var helper2 = new THREE.CameraHelper(this.camera2);
-		// this.scene.add(helper2);
-
-
-		this.camera = this.camera1;
-
 
 		// init renderer
 		this.renderer = new THREE.WebGLRenderer({
@@ -176,7 +155,6 @@ class linesScene {
 		this.renderer.gammaInput = true;
 		this.renderer.gammaOutput = true;
 		this.renderer.shadowMap.enabled = true;
-
 		this.container.appendChild(this.renderer.domElement);
 
 
@@ -190,10 +168,23 @@ class linesScene {
 		this.scene.add(this.raycasterPlane);
 
 
+
+		this.camera1 = new THREE.PerspectiveCamera(40, cw / ch, 1, 1500);
+		this.camera1.position.set(0, 0, 1000);
+		this.scene.add(this.camera1);
+		this.camera = this.camera1;
+		
+
+		// var helper1 = new THREE.CameraHelper(this.camera1);
+		// this.scene.add(helper1);
+
+		// this.camera0 = new THREE.PerspectiveCamera(60, cw / ch, 1, 20000);
+		// this.camera0.position.set(0, 0, 1000);
+		// this.scene.add(this.camera0);
+		// this.camera = this.camera0;
 		// // controls
 		// this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 		// this.controls.update();
-
 
 
 		window.addEventListener('resize', this.onWindowResized);

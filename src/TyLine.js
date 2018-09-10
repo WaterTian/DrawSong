@@ -85,8 +85,8 @@ class TyLine extends THREE.Object3D {
 	}
 
 	smoothPoints() {
-		let _curve = new THREE.SplineCurve3(this.points);
-		this.points = _curve.getPoints(250);
+		let _curve = new THREE.CatmullRomCurve3(this.points);
+		this.points = _curve.getPoints(this.maxPoints); //250
 		this.setPoints(this.points);
 	}
 
