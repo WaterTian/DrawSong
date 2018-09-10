@@ -24,6 +24,7 @@ class TyLine extends THREE.Object3D {
 		this.points = []; //构成线的点们
 		this.maxPoints = 256; //点上限数
 
+		this.pointZ = 0;
 
 		this.lineMesh = new TyLineMesh();
 		this.lineMesh.uniforms.color.value = new THREE.Color(this.lineColor);
@@ -39,13 +40,17 @@ class TyLine extends THREE.Object3D {
 		this.add(this.emoji);
 		this.emoji.position.x = this.center[0];
 		this.emoji.position.y = this.center[1];
+		this.emoji.position.z = this.pointZ / 2;
 	}
 
 	//////////////
-	addPoint(_v3) {
+	addPoint(_v2) {
 		if (this.points.length > this.maxPoints) this.points.shift();
+		let _v3 = new THREE.Vector3(_v2.x, _v2.y, this.pointZ);
 		this.points.push(_v3);
 		this.setPoints(this.points);
+
+		this.pointZ++;
 	}
 
 
@@ -94,13 +99,13 @@ class TyLine extends THREE.Object3D {
 	shake() {
 		let That = this;
 
-		TweenMax.to(That.position, .5, {
-			x: -That.center[0] / 5,
-			y: -That.center[1] / 5,
-			z: 200,
+		TweenMax.to(That.lineMesh.position, .5, {
+			x: -That.center[0] / 10,
+			y: -That.center[1] / 10,
+			z: 100,
 			ease: Elastic.easeOut
 		});
-		TweenMax.to(That.position, 1, {
+		TweenMax.to(That.lineMesh.position, 1, {
 			x: 0,
 			y: 0,
 			z: 0,

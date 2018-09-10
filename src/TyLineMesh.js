@@ -84,7 +84,7 @@ class TyLineMesh extends THREE.Mesh {
 			transparent: true,
 			side: THREE.DoubleSide,
 			// wireframe: true,
-			depthWrite: false,
+			// depthWrite: false,
 			// blending: THREE.AdditiveBlending,
 		});
 	}

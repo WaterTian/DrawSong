@@ -13,6 +13,18 @@ import TyRecognizer from './TyRecognizer';
 import introObject from './introObject';
 
 
+
+import './postprocessing/EffectComposer';
+import './postprocessing/RenderPass';
+import './postprocessing/ShaderPass';
+import './shaders/CopyShader';
+import './shaders/FXAAShader';
+import './shaders/ConvolutionShader';
+import './shaders/LuminosityHighPassShader';
+import './shaders/ScreenShader';
+
+
+
 const OrbitControls = OrbitContructor(THREE);
 const glslify = require('glslify');
 const Recognizer = new TyRecognizer();
@@ -39,10 +51,6 @@ var firstTimeEver = true;
 
 var euler = new THREE.Euler();
 var q0 = new THREE.Quaternion();
-var orientationScale = {
-	value: 1
-};
-
 
 var isPlaying = false;
 var curPlayNum = 0;
@@ -148,8 +156,8 @@ class linesScene {
 			preserveDrawingBuffer: true,
 		});
 
-		console.log(window.devicePixelRatio);
-		this.renderer.setPixelRatio(window.devicePixelRatio);
+		// console.log(window.devicePixelRatio);
+		// this.renderer.setPixelRatio(window.devicePixelRatio);
 		this.renderer.setSize(cw, ch);
 		this.renderer.setClearColor(0xffffff);
 		this.renderer.gammaInput = true;
@@ -173,7 +181,7 @@ class linesScene {
 		this.camera1.position.set(0, 0, 1000);
 		this.scene.add(this.camera1);
 		this.camera = this.camera1;
-		
+
 
 		// var helper1 = new THREE.CameraHelper(this.camera1);
 		// this.scene.add(helper1);
@@ -189,8 +197,10 @@ class linesScene {
 
 		window.addEventListener('resize', this.onWindowResized);
 		this.onWindowResized();
-		// if (window.DeviceOrientationEvent) window.addEventListener("deviceorientation", this.onOrientation);
+		if (window.DeviceOrientationEvent) window.addEventListener("deviceorientation", this.onOrientation);
 
+
+		this.initEffectComposer();
 
 		time = Date.now();
 		this.animate();
@@ -207,7 +217,8 @@ class linesScene {
 		That.camera.updateProjectionMatrix();
 
 		// var dPR = window.devicePixelRatio;
-		// if (this.effect) this.effect.uniforms['u_resolution'].value.set(w * dPR, h * dPR);
+		// if (this.effect) this.effect.uniforms['u_resolution'].value.set(cw * dPR, ch * dPR);
+		// if (this.effect) this.effect.uniforms['u_resolution'].value.set(cw, ch);
 	}
 	onOrientation(event) {
 		var alpha = event.alpha ? THREE.Math.degToRad(event.alpha) : 0; // Z
@@ -215,13 +226,14 @@ class linesScene {
 		var gamma = event.gamma ? THREE.Math.degToRad(event.gamma) : 0; // Y''
 		var orient = event.screenOrientation ? THREE.Math.degToRad(event.screenOrientation) : 0; // O
 
+		// console.log(" beta "+beta+" gamma "+gamma);
 
 		if (event.gamma < 0) {
-			euler.set((-gamma - Math.PI * 0.2) * 0.5 * orientationScale.value, beta * 0.4 * orientationScale.value, 0, 'YXZ');
+			euler.set((-gamma - Math.PI * 0.2) * 0.6, beta * 0.5, 0, 'YXZ');
 		}
 
-		// q0.setFromEuler(euler);
-		// if (That.linesObj) That.linesObj.quaternion.slerp(q0, 0.3);
+		q0.setFromEuler(euler);
+		if (That.linesObj) That.linesObj.quaternion.slerp(q0, 0.3);
 	}
 
 
@@ -359,6 +371,8 @@ class linesScene {
 		That.lines.push(line);
 		That.curLine = line;
 
+		That.curLine.Num = That.lines.length;
+
 		_isDown = true;
 	}
 
@@ -372,8 +386,9 @@ class linesScene {
 			var intersects = That.raycaster.intersectObject(That.raycasterPlane);
 			if (intersects.length > 0) {
 				// console.log(intersects[0].point);
+				let _v2 = new THREE.Vector2(intersects[0].point.x, intersects[0].point.y);
 				// addPoint
-				That.curLine.addPoint(intersects[0].point);
+				That.curLine.addPoint(_v2);
 			}
 		}
 	}
@@ -398,14 +413,14 @@ class linesScene {
 		console.log(result);
 
 		That.curLine.detune = Math.floor((That.curLine.center[1] / ch + 0.5) * 10);
-		That.curLine.order = Math.floor((That.curLine.center[0] / cw + 0.5) * 14);
+		That.curLine.order = Math.floor((That.curLine.center[0] / cw + 0.5) * 16);
 
 		if (That.curLine.detune < 1) That.curLine.detune = 1;
 		if (That.curLine.detune > 8) That.curLine.detune = 8;
 		That.curLine.detune--;
 
 		if (That.curLine.order < 1) That.curLine.order = 1;
-		if (That.curLine.order > 12) That.curLine.order = 12;
+		if (That.curLine.order > 14) That.curLine.order = 14;
 		That.curLine.order--;
 
 		console.log("order " + That.curLine.order);
@@ -491,16 +506,35 @@ class linesScene {
 		That.curLine.shake();
 
 		if (That.lines.length > maxLinesNum) {
-
 			That.lines[0].removeThis(function() {
 				That.linesObj.remove(That.lines[0]);
 				That.lines.shift();
 			});
 		}
 
+		That.lines.forEach(function(l, i) {
+			TweenMax.to(l.position, 1, {
+				z: -(That.lines.length - i) * 10,
+				ease: Linear.easeNone
+			});
+		});
 	}
 
+	initEffectComposer() {
+		this.composer = new THREE.EffectComposer(this.renderer);
+		this.composer.addPass(new THREE.RenderPass(this.scene, this.camera));
 
+		//扛锯齿
+		var effectFXAA = new THREE.ShaderPass(THREE.FXAAShader);
+		effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight);
+		this.composer.addPass(effectFXAA);
+
+
+		this.effect = new THREE.ShaderPass(THREE.ScreenShader);
+		this.effect.renderToScreen = true;
+		this.composer.addPass(this.effect);
+
+	}
 
 	animate() {
 		let newTime = Date.now();
@@ -508,8 +542,8 @@ class linesScene {
 		this.render(newTime - time);
 		time = newTime;
 
-		if (That.intro) {
-			// That.intro.rotation.y+=0.03;
+		if (That.linesObj) {
+			That.linesObj.rotation.y = Math.sin(time * 0.001) * 0.3;
 		}
 
 	}
@@ -633,7 +667,7 @@ class linesScene {
 			}
 		});
 		curPlayNum++;
-		if (curPlayNum > 11) curPlayNum = 0;
+		if (curPlayNum > 13) curPlayNum = 0;
 
 		setTimeout(function() {
 			That.musicLoop();
