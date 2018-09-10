@@ -371,8 +371,6 @@ class linesScene {
 		That.lines.push(line);
 		That.curLine = line;
 
-		That.curLine.Num = That.lines.length;
-
 		_isDown = true;
 	}
 
@@ -533,7 +531,18 @@ class linesScene {
 		this.effect = new THREE.ShaderPass(THREE.ScreenShader);
 		this.effect.renderToScreen = true;
 		this.composer.addPass(this.effect);
+	}
 
+	Dou() {
+		TweenMax.to(That.effect.uniforms.u_range, .3, {
+			value: 15,
+			ease: Elastic.easeOut
+		});
+		TweenMax.to(That.effect.uniforms.u_range, .3, {
+			value: 0,
+			delay: .3,
+			ease: Linear.easeNone
+		});
 	}
 
 	animate() {
@@ -542,9 +551,7 @@ class linesScene {
 		this.render(newTime - time);
 		time = newTime;
 
-		if (That.linesObj) {
-			That.linesObj.rotation.y = Math.sin(time * 0.001) * 0.3;
-		}
+		// if (That.linesObj) That.linesObj.rotation.y = Math.sin(time * 0.001) * 0.3;
 
 	}
 
@@ -657,8 +664,12 @@ class linesScene {
 		That.lines.forEach(function(l, i) {
 			if (l.order == curPlayNum) {
 				if (useT) {
-					if (l.audioName) That.tyAudio.play(l.audioName, l.detune);
-					else That.tyAudio.playBase(l.detune);
+					if (l.audioName) {
+						That.tyAudio.play(l.audioName, l.detune);
+					} else {
+						That.tyAudio.playBase(l.detune);
+						if (l.detune % 3 != 3) That.Dou();
+					}
 				} else {
 					if (l.audioName) That.tyAudio.playMarimba(l.detune);
 					else That.tyAudio.playBase(l.detune);

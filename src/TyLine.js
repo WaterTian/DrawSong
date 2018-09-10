@@ -40,7 +40,7 @@ class TyLine extends THREE.Object3D {
 		this.add(this.emoji);
 		this.emoji.position.x = this.center[0];
 		this.emoji.position.y = this.center[1];
-		this.emoji.position.z = this.pointZ / 2;
+		this.emoji.position.z = this.pointZ / 4;
 	}
 
 	//////////////
@@ -99,30 +99,44 @@ class TyLine extends THREE.Object3D {
 	shake() {
 		let That = this;
 
-		TweenMax.to(That.lineMesh.position, .5, {
-			x: -That.center[0] / 10,
-			y: -That.center[1] / 10,
-			z: 100,
-			ease: Elastic.easeOut
-		});
-		TweenMax.to(That.lineMesh.position, 1, {
-			x: 0,
-			y: 0,
-			z: 0,
-			delay: .5,
-			ease: Linear.easeNone
-		});
-		// TweenMax.to(That.scale, .5, {
-		// 	x: 1.25,
-		// 	y: 1.25,
+		// TweenMax.to(That.lineMesh.position, .5, {
+		// 	x: -That.center[0] / 10,
+		// 	y: -That.center[1] / 10,
+		// 	z: 100,
 		// 	ease: Elastic.easeOut
 		// });
-		// TweenMax.to(That.scale, 1, {
-		// 	x: 1,
-		// 	y: 1,
+		// TweenMax.to(That.lineMesh.position, 1, {
+		// 	x: 0,
+		// 	y: 0,
+		// 	z: 0,
 		// 	delay: .5,
 		// 	ease: Linear.easeNone
 		// });
+		TweenMax.to(That.scale, .5, {
+			x: 1.2,
+			y: 1.2,
+			ease: Elastic.easeOut
+		});
+		TweenMax.to(That.scale, 1, {
+			x: 1,
+			y: 1,
+			delay: .5,
+			ease: Linear.easeNone
+		});
+		TweenMax.to(That.position, .5, {
+			x: -That.center[0] / 6,
+			y: -That.center[1] / 6,
+			ease: Elastic.easeOut
+		});
+		TweenMax.to(That.position, 1, {
+			x: 0,
+			y: 0,
+			delay: .5,
+			ease: Linear.easeNone
+		});
+
+
+
 
 
 		TweenMax.to(That.lineMesh.uniforms.wobble, 0.5, {
