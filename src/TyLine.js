@@ -25,6 +25,7 @@ class TyLine extends THREE.Object3D {
 		this.maxPoints = 256; //点上限数
 
 		this.pointZ = 0;
+		this.haveEmoji = false;
 
 		this.lineMesh = new TyLineMesh();
 		this.lineMesh.uniforms.color.value = new THREE.Color(this.lineColor);
@@ -32,6 +33,7 @@ class TyLine extends THREE.Object3D {
 		this.lineMesh.uniforms.map.value = _lineTexture;
 		// this.lineMesh.uniforms.repeat.value = new THREE.Vector2(1, 1);
 		this.add(this.lineMesh);
+
 	}
 
 	///////////
@@ -40,7 +42,9 @@ class TyLine extends THREE.Object3D {
 		this.add(this.emoji);
 		this.emoji.position.x = this.center[0];
 		this.emoji.position.y = this.center[1];
-		this.emoji.position.z = this.pointZ / 4;
+		// this.emoji.position.z = this.pointZ / 4;
+
+		this.haveEmoji = true;
 	}
 
 	//////////////
@@ -90,6 +94,8 @@ class TyLine extends THREE.Object3D {
 	}
 
 	smoothPoints() {
+		if (this.points.length < 2) return;
+
 		let _curve = new THREE.CatmullRomCurve3(this.points);
 		this.points = _curve.getPoints(this.maxPoints); //250
 		this.setPoints(this.points);
@@ -137,8 +143,6 @@ class TyLine extends THREE.Object3D {
 
 
 
-
-
 		TweenMax.to(That.lineMesh.uniforms.wobble, 0.5, {
 			value: 20,
 			ease: Strong.easeOut
@@ -167,6 +171,19 @@ class TyLine extends THREE.Object3D {
 
 	update(_time) {
 		this.lineMesh.uniforms.time.value++;
+	}
+
+
+	/// for player 
+	show(_delay = 0, callback) {
+		this.lineMesh.uniforms.visibility.value = 0;
+		TweenMax.to(this.lineMesh.uniforms.visibility, .4, {
+			value: 1,
+			delay: _delay,
+			onComplete: function() {
+				callback();
+			}
+		});
 	}
 
 

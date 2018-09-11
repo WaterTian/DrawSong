@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>webglAvailable</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="stylesheet" type="text/css" href="dist/style.css">
+</head>
+
+<body>
+    <script>
+
+        function webglAvailable() {
+            try {
+                var canvas = document.createElement( 'canvas' );
+                return !!( window.WebGLRenderingContext && (
+                    canvas.getContext( 'webgl' ) ||
+                    canvas.getContext( 'experimental-webgl' ) )
+                );
+            } catch ( e ) {
+                return false;
+            }
+        }
+
+        //log
+        logBox = document.createElement('div');
+        logBox.style.position = 'absolute';
+        logBox.style.top = '10px';
+        logBox.style.left = '15px';
+        logBox.style.width = '100%';
+        logBox.style.textAlign = 'left';
+        logBox.style.fontSize = '10px';
+        logBox.style.color = "#666666";
+        logBox.innerHTML = 'webglAvailable:<br>';
+        document.body.appendChild(logBox);
+
+
+        logBox.innerHTML+=webglAvailable();
+
+    </script>
+</body>
+
+</html>

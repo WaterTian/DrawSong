@@ -6,11 +6,13 @@ import VConsole from 'vconsole';
 import OrbitContructor from 'three-orbit-controls';
 import Tone from 'Tone';
 
-
+import Unit from './Unit';
 import TyAudio from './TyAudio';
 import TyLine from './TyLine';
 import TyRecognizer from './TyRecognizer';
 import introObject from './introObject';
+
+import linesPlayer from './linesPlayer';
 
 
 
@@ -28,6 +30,7 @@ import './shaders/ScreenShader';
 const OrbitControls = OrbitContructor(THREE);
 const glslify = require('glslify');
 const Recognizer = new TyRecognizer();
+const tool = new Unit();
 
 const StartAudioContext = require('./StartAudioContext.js');
 
@@ -56,6 +59,7 @@ var isPlaying = false;
 var curPlayNum = 0;
 var isIntro = false;
 
+var URL_id = null;
 
 
 window.colors = [
@@ -94,6 +98,9 @@ class linesScene {
 		this.init();
 
 
+		URL_id = tool.getUrlStr("id");
+
+
 		//mobile start
 		if (isMobile) {
 			var element = $("<div>", {
@@ -103,6 +110,7 @@ class linesScene {
 
 			StartAudioContext(Tone.context, element, function() {
 				element.remove();
+
 				That.initUnit();
 			});
 		} else {
@@ -113,6 +121,14 @@ class linesScene {
 
 
 	initUnit() {
+
+		if (URL_id) {
+			That.initPlayer();
+			document.querySelector(".unit").style.display = "none";
+			document.querySelector(".unit").style.display = "none";
+			return;
+		}
+
 
 		let btn1 = document.getElementById('unitBtn1');
 		btn1.addEventListener('click', function() {
@@ -134,9 +150,19 @@ class linesScene {
 			That.tyAudio = new TyAudio('ovs');
 			That.initIntro('ovs', [9, 10, 11]);
 		});
-
 	}
 
+	/////
+	initPlayer() {
+		That.initLine();
+		That.initUI();
+
+		That.player = new linesPlayer(That.lines, That.linesObj, (audios) => {
+			That.tyAudio = new TyAudio(audios);
+			That.reorderLinesWithZ();
+		});
+
+	}
 
 
 	init() {
@@ -325,33 +351,33 @@ class linesScene {
 				e = e.targetTouches[0];
 				That.drawStart(e);
 			}, false);
-			this.renderer.domElement.addEventListener("touchmove", function(e) {
+			this.renderer.domElement.addEventListener("touchmove", (e) => {
 				e.preventDefault();
 				if (e.stopPropagation) e.stopPropagation();
 				That.drawMove(e.changedTouches[0]);
 			}, false);
-			this.renderer.domElement.addEventListener("touchend", function(e) {
+			this.renderer.domElement.addEventListener("touchend", (e) => {
 				e.preventDefault();
 				if (e.stopPropagation) e.stopPropagation();
 				That.drawEnd();
 			}, false);
-			this.renderer.domElement.addEventListener("touchcancel", function(e) {
+			this.renderer.domElement.addEventListener("touchcancel", (e) => {
 				e.preventDefault();
 				if (e.stopPropagation) e.stopPropagation();
 				_isDown = false;
 			}, false);
 		} else {
-			document.addEventListener("mouseup", function(e) {
+			this.renderer.domElement.addEventListener("mouseup", (e) => {
 				e.preventDefault();
 				if (e.stopPropagation) e.stopPropagation();
 				That.drawEnd();
 			}, false);
-			document.addEventListener("mousedown", function(e) {
+			this.renderer.domElement.addEventListener("mousedown", (e) => {
 				e.preventDefault();
 				if (e.stopPropagation) e.stopPropagation();
 				That.drawStart(e);
 			}, false);
-			document.addEventListener("mousemove", function(e) {
+			this.renderer.domElement.addEventListener("mousemove", (e) => {
 				e.preventDefault();
 				That.drawMove(e);
 			}, false);
@@ -424,6 +450,7 @@ class linesScene {
 		console.log("order " + That.curLine.order);
 
 		let useT = !document.getElementById('useT').checked;
+
 
 		/////
 		That.curLine.smoothPoints();
@@ -510,6 +537,11 @@ class linesScene {
 			});
 		}
 
+		///
+		That.reorderLinesWithZ();
+	}
+
+	reorderLinesWithZ() {
 		That.lines.forEach(function(l, i) {
 			TweenMax.to(l.position, 1, {
 				z: -(That.lines.length - i) * 10,
@@ -551,7 +583,9 @@ class linesScene {
 		this.render(newTime - time);
 		time = newTime;
 
-		// if (That.linesObj) That.linesObj.rotation.y = Math.sin(time * 0.001) * 0.3;
+
+		////test
+		if (That.linesObj) That.linesObj.rotation.y = Math.sin(time * 0.001) * 0.3;
 
 	}
 
@@ -614,6 +648,8 @@ class linesScene {
 	}
 
 	undoMuisc() {
+		console.log("undoMuisc");
+
 		isPlaying = false
 		document.getElementById('play').style.display = "block";
 		document.getElementById('pause').style.display = "none";
@@ -654,6 +690,9 @@ class linesScene {
 			document.getElementById('play').style.display = "block";
 			document.getElementById('pause').style.display = "none";
 		}
+
+
+		That.saveLines();
 	}
 
 	musicLoop() {
@@ -685,6 +724,43 @@ class linesScene {
 		}, 200);
 	}
 
+
+	saveLines() {
+
+		let linesData = [];
+		That.lines.forEach(function(l) {
+			let lineData = {
+				"lineColor": l.lineColor,
+				"detune": l.detune,
+				"order": l.order,
+				"audioName": l.audioName,
+				"emoji": l.haveEmoji,
+				"points": []
+			}
+
+			l.points.forEach(function(p) {
+				lineData.points.push(p.x);
+				lineData.points.push(p.y);
+				lineData.points.push(p.z);
+			});
+
+			linesData.push(lineData);
+		});
+
+		let linesStr = JSON.stringify(linesData);
+
+
+
+		let sendData = {
+			'audios': That.tyAudio.names,
+			'lines': linesStr
+		}
+
+		// console.log(linesStr);
+		// tool.postJson('./saveJson.php', sendData).then(function(data) {
+		// 	console.log(data);
+		// });
+	}
 }
 
 export default linesScene;
