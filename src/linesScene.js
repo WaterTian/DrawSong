@@ -92,7 +92,7 @@ class linesScene {
 	constructor() {
 		That = this;
 
-		this.vconsole = new VConsole();
+		// this.vconsole = new VConsole();
 		this.stats = new Stats();
 		document.body.appendChild(this.stats.dom);
 
@@ -598,7 +598,7 @@ class linesScene {
 		if (!That.effect) return;
 
 		TweenMax.to(That.effect.uniforms.u_range, .3, {
-			value: 25,
+			value: 20,
 			ease: Elastic.easeOut
 		});
 		TweenMax.to(That.effect.uniforms.u_range, .3, {
