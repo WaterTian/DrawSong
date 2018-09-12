@@ -42,7 +42,7 @@ class TyLine extends THREE.Object3D {
 		this.add(this.emoji);
 		this.emoji.position.x = this.center[0];
 		this.emoji.position.y = this.center[1];
-		// this.emoji.position.z = this.pointZ / 4;
+		this.emoji.position.z = this.pointZ;
 
 		this.haveEmoji = true;
 	}

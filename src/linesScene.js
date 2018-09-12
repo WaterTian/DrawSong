@@ -42,8 +42,10 @@ var That;
 var time = 0;
 var zoom = 0;
 
+var dPR = window.devicePixelRatio;
 var cw = window.innerWidth;
-var ch = window.innerHeight;
+var ch = cw * 675 / 1200;
+var ctop = (window.innerHeight - ch) / 2;
 
 var _isDown = false;
 var maxPoints = 256;
@@ -95,6 +97,8 @@ class linesScene {
 		document.body.appendChild(this.stats.dom);
 
 		this.container = document.getElementById('webglContainer');
+		this.container.style.top = ctop + 'px';
+
 		this.init();
 
 
@@ -182,19 +186,20 @@ class linesScene {
 			preserveDrawingBuffer: true,
 		});
 
-		// console.log(window.devicePixelRatio);
-		// this.renderer.setPixelRatio(window.devicePixelRatio);
+		console.log(cw + "_" + ch);
+
+		this.renderer.setPixelRatio(dPR);
 		this.renderer.setSize(cw, ch);
 		this.renderer.setClearColor(0xffffff);
 		this.renderer.gammaInput = true;
 		this.renderer.gammaOutput = true;
-		this.renderer.shadowMap.enabled = true;
+		// this.renderer.shadowMap.enabled = true;
 		this.container.appendChild(this.renderer.domElement);
 
 
 		//
 		this.raycaster = new THREE.Raycaster();
-		this.raycasterPlane = new THREE.Mesh(new THREE.PlaneBufferGeometry(cw * 2, ch * 2, 3, 3), new THREE.MeshNormalMaterial({
+		this.raycasterPlane = new THREE.Mesh(new THREE.PlaneBufferGeometry(1200 * 2, 675 * 2, 3, 3), new THREE.MeshNormalMaterial({
 			side: THREE.DoubleSide,
 			wireframe: true,
 		}));
@@ -203,7 +208,7 @@ class linesScene {
 
 
 
-		this.camera1 = new THREE.PerspectiveCamera(40, cw / ch, 1, 1500);
+		this.camera1 = new THREE.PerspectiveCamera(35, cw / ch, 1, 1500);
 		this.camera1.position.set(0, 0, 1000);
 		this.scene.add(this.camera1);
 		this.camera = this.camera1;
@@ -222,7 +227,7 @@ class linesScene {
 
 
 		window.addEventListener('resize', this.onWindowResized);
-		this.onWindowResized();
+		// this.onWindowResized();
 		if (window.DeviceOrientationEvent) window.addEventListener("deviceorientation", this.onOrientation);
 
 
@@ -234,32 +239,52 @@ class linesScene {
 	}
 
 	onWindowResized() {
-		cw = That.container.clientWidth;
-		ch = That.container.clientHeight;
+		// That.doResized();
+		setTimeout(That.doResized, 100);
+	}
 
+	doResized() {
+		cw = window.innerWidth;
+		ch = cw * 675 / 1200;
+		ctop = (window.innerHeight - ch) / 2;
+
+		That.container.style.width = cw + 'px';
+		That.container.style.height = ch + 'px';
+		That.container.style.top = ctop + 'px';
+
+		That.renderer.setPixelRatio(window.devicePixelRatio);
 		That.renderer.setSize(cw, ch);
 
 		That.camera.aspect = cw / ch;
 		That.camera.updateProjectionMatrix();
 
-		// var dPR = window.devicePixelRatio;
-		// if (this.effect) this.effect.uniforms['u_resolution'].value.set(cw * dPR, ch * dPR);
-		// if (this.effect) this.effect.uniforms['u_resolution'].value.set(cw, ch);
+		if (That.effectFXAA) That.effectFXAA.uniforms['resolution'].value.set(1 / cw, 1 / ch);
+		if (That.effect) That.effect.uniforms['u_resolution'].value.set(cw * dPR, ch * dPR);
+		// if (That.effect) That.effect.uniforms['u_resolution'].value.set(cw, ch);
 	}
 	onOrientation(event) {
-		var alpha = event.alpha ? THREE.Math.degToRad(event.alpha) : 0; // Z
-		var beta = event.beta ? THREE.Math.degToRad(event.beta) : 0; // X'
-		var gamma = event.gamma ? THREE.Math.degToRad(event.gamma) : 0; // Y''
-		var orient = event.screenOrientation ? THREE.Math.degToRad(event.screenOrientation) : 0; // O
+		let alpha = event.alpha ? THREE.Math.degToRad(event.alpha) : 0; // Z
+		let beta = event.beta ? THREE.Math.degToRad(event.beta) : 0; // X'
+		let gamma = event.gamma ? THREE.Math.degToRad(event.gamma) : 0; // Y''
+		let orient = event.screenOrientation ? THREE.Math.degToRad(event.screenOrientation) : 0; // O
 
 		// console.log(" beta "+beta+" gamma "+gamma);
 
+		let _rx = beta * 0.6;
+		let _ry = (-gamma) * 0.6;
+		// let _ry = (-gamma - Math.PI * 0.3) * 0.6;
+
 		if (event.gamma < 0) {
-			euler.set((-gamma - Math.PI * 0.2) * 0.6, beta * 0.5, 0, 'YXZ');
+			if (window.innerWidth > window.innerHeight) {
+				euler.set(_ry, _rx, 0, 'YXZ');
+			} else {
+				euler.set(_rx, _ry, 0, 'YXZ');
+			}
 		}
 
 		q0.setFromEuler(euler);
 		if (That.linesObj) That.linesObj.quaternion.slerp(q0, 0.3);
+		if (That.raycasterPlane) That.raycasterPlane.quaternion.slerp(q0, 0.3);
 	}
 
 
@@ -345,39 +370,39 @@ class linesScene {
 		// this.addLine();
 		// this.curLine.setPoints(curPoints);
 		if (('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0)) {
-			this.renderer.domElement.addEventListener("touchstart", (e) => {
+			this.container.addEventListener("touchstart", (e) => {
 				e.preventDefault();
 				if (e.stopPropagation) e.stopPropagation();
 				e = e.targetTouches[0];
 				That.drawStart(e);
 			}, false);
-			this.renderer.domElement.addEventListener("touchmove", (e) => {
+			this.container.addEventListener("touchmove", (e) => {
 				e.preventDefault();
 				if (e.stopPropagation) e.stopPropagation();
 				That.drawMove(e.changedTouches[0]);
 			}, false);
-			this.renderer.domElement.addEventListener("touchend", (e) => {
+			this.container.addEventListener("touchend", (e) => {
 				e.preventDefault();
 				if (e.stopPropagation) e.stopPropagation();
 				That.drawEnd();
 			}, false);
-			this.renderer.domElement.addEventListener("touchcancel", (e) => {
+			this.container.addEventListener("touchcancel", (e) => {
 				e.preventDefault();
 				if (e.stopPropagation) e.stopPropagation();
 				_isDown = false;
 			}, false);
 		} else {
-			this.renderer.domElement.addEventListener("mouseup", (e) => {
+			this.container.addEventListener("mouseup", (e) => {
 				e.preventDefault();
 				if (e.stopPropagation) e.stopPropagation();
 				That.drawEnd();
 			}, false);
-			this.renderer.domElement.addEventListener("mousedown", (e) => {
+			this.container.addEventListener("mousedown", (e) => {
 				e.preventDefault();
 				if (e.stopPropagation) e.stopPropagation();
 				That.drawStart(e);
 			}, false);
-			this.renderer.domElement.addEventListener("mousemove", (e) => {
+			this.container.addEventListener("mousemove", (e) => {
 				e.preventDefault();
 				That.drawMove(e);
 			}, false);
@@ -402,8 +427,9 @@ class linesScene {
 
 	drawMove(e) {
 		if (_isDown) {
-			var x = e.clientX / cw * 2 - 1;
-			var y = -e.clientY / ch * 2 + 1;
+			// console.log(e);
+			var x = (e.clientX / cw * 2 - 1);
+			var y = -((e.clientY - ctop) / ch * 2 - 1);
 			var mouse = new THREE.Vector2(x, y);
 			That.raycaster.setFromCamera(mouse, That.camera);
 
@@ -555,19 +581,24 @@ class linesScene {
 		this.composer.addPass(new THREE.RenderPass(this.scene, this.camera));
 
 		//扛锯齿
-		var effectFXAA = new THREE.ShaderPass(THREE.FXAAShader);
-		effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight);
-		this.composer.addPass(effectFXAA);
+		this.effectFXAA = new THREE.ShaderPass(THREE.FXAAShader);
+		this.effectFXAA.uniforms['resolution'].value.set(1 / cw, 1 / ch);
+		this.composer.addPass(this.effectFXAA);
 
 
 		this.effect = new THREE.ShaderPass(THREE.ScreenShader);
 		this.effect.renderToScreen = true;
 		this.composer.addPass(this.effect);
+		///
+		this.effect.uniforms['u_resolution'].value.set(cw * dPR, ch * dPR);
+		// this.effect.uniforms['u_resolution'].value.set(cw, ch);
 	}
 
 	Dou() {
+		if (!That.effect) return;
+
 		TweenMax.to(That.effect.uniforms.u_range, .3, {
-			value: 15,
+			value: 25,
 			ease: Elastic.easeOut
 		});
 		TweenMax.to(That.effect.uniforms.u_range, .3, {
@@ -585,7 +616,8 @@ class linesScene {
 
 
 		////test
-		if (That.linesObj) That.linesObj.rotation.y = Math.sin(time * 0.001) * 0.3;
+		// if (That.linesObj) That.linesObj.rotation.y = Math.sin(time * 0.001) * 0.3;
+		// if (That.raycasterPlane) That.raycasterPlane.rotation.y = Math.sin(time * 0.001) * 0.3;
 
 	}
 

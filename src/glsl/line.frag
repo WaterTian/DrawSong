@@ -1,5 +1,5 @@
 #extension GL_OES_standard_derivatives : enable
-precision mediump float;
+precision highp float;
 
 uniform sampler2D map;
 uniform sampler2D alphaMap;

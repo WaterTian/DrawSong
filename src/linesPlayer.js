@@ -27,7 +27,7 @@ class linesPlayer {
 			console.log(json);
 
 			That.initLines(json);
-			
+
 			That.callback(json.audios);
 
 		}, function(error) {
@@ -37,7 +37,7 @@ class linesPlayer {
 
 	initLines(json) {
 
-		json.lines.forEach(function(l,i) {
+		json.lines.forEach(function(l, i) {
 			let line = new TyLine(l.lineColor, lineTexture, "parabolic");
 			line.detune = l.detune;
 			line.order = l.order;
@@ -50,15 +50,13 @@ class linesPlayer {
 			for (let j = 0; j < l.points.length; j += 3) {
 				_ps.push(new THREE.Vector3(l.points[j], l.points[j + 1], l.points[j + 2]))
 			}
-
+			line.pointZ = _ps[_ps.length - 1].z;
 			line.setPoints(_ps);
-			line.show(i*0.3,()=>{
-				if(l.emoji) line.addEmoji();
+			line.show(i * 0.3, () => {
+				if (l.emoji) line.addEmoji();
 			});
-			
+
 		});
-
-
 	}
 
 
