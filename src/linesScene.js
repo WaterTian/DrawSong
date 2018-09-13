@@ -475,9 +475,6 @@ class linesScene {
 
 		console.log("order " + That.curLine.order);
 
-		let useT = !document.getElementById('useT').checked;
-
-
 		/////
 		That.curLine.smoothPoints();
 
@@ -530,25 +527,17 @@ class linesScene {
 		}
 		// Scene
 		else {
-			// 识别字母
-			if (useT) {
-				// 识别出
-				if (result.Score > 2) {
-					That.curLine.audioName = result.Name;
+			// 识别出
+			if (result.Score > 2) {
+				That.curLine.audioName = result.Name;
 
-					/// 是否当节课的字母 否则播base 不添加表情
-					let _playAble = That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
-					if (_playAble) That.curLine.addEmoji();
-				}
-				// 未识别出
-				else {
-					That.tyAudio.playBase(That.curLine.detune);
-				}
+				/// 是否当节课的字母 否则播base 不添加表情
+				let _playAble = That.tyAudio.play(That.curLine.audioName, That.curLine.detune);
+				if (_playAble) That.curLine.addEmoji();
 			}
-			// 不识别字母 
+			// 未识别出
 			else {
-				// 不识别字母直接播放木琴
-				That.tyAudio.playMarimba(That.curLine.detune);
+				That.tyAudio.playBase(That.curLine.detune);
 			}
 		}
 
@@ -730,21 +719,16 @@ class linesScene {
 	musicLoop() {
 		if (!isPlaying) return;
 		console.log("musicLoop " + curPlayNum);
-		let useT = !document.getElementById('useT').checked;
 
 		That.lines.forEach(function(l, i) {
 			if (l.order == curPlayNum) {
-				if (useT) {
-					if (l.audioName) {
-						That.tyAudio.play(l.audioName, l.detune);
-					} else {
-						That.tyAudio.playBase(l.detune);
-						if (l.detune % 3 != 3) That.Dou();
-					}
+				if (l.audioName) {
+					That.tyAudio.play(l.audioName, l.detune);
 				} else {
-					if (l.audioName) That.tyAudio.playMarimba(l.detune);
-					else That.tyAudio.playBase(l.detune);
+					That.tyAudio.playBase(l.detune);
+					if (l.detune % 3 != 3) That.Dou();
 				}
+
 				l.shake();
 			}
 		});
