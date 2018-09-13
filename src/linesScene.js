@@ -128,7 +128,6 @@ class linesScene {
 		if (URL_id) {
 			That.initPlayer();
 			document.querySelector(".unit").style.display = "none";
-			document.querySelector(".unit").style.display = "none";
 			return;
 		}
 
@@ -147,6 +146,16 @@ class linesScene {
 		let btn2 = document.getElementById('unitBtn2');
 		btn2.addEventListener('click', function() {
 			console.log("unit2");
+
+			document.querySelector(".unit").style.display = "none";
+
+			That.tyAudio = new TyAudio('elz');
+			That.initIntro('elz', [8, 12, 13]);
+		});
+
+		let btn3 = document.getElementById('unitBtn3');
+		btn3.addEventListener('click', function() {
+			console.log("unit3");
 
 			document.querySelector(".unit").style.display = "none";
 
@@ -305,8 +314,8 @@ class linesScene {
 
 		That.initLine();
 		/////////////////////////////////// skip
-		// That.initIntro1();
-		That.removeIntro();
+		That.initIntro1();
+		// That.removeIntro();
 	}
 
 	initIntro1() {
@@ -456,7 +465,13 @@ class linesScene {
 		for (var i = 0; i < That.curLine.points.length; i += 3) {
 			linePs.push(That.curLine.points[i].x);
 			linePs.push(That.curLine.points[i].y);
+            //// 字母笔记采样
+			// linePs.push(That.curLine.points[i].x.toFixed(2));
+			// linePs.push(That.curLine.points[i].y.toFixed(2));
 		}
+		//// 字母笔记采样
+		// console.log(linePs.toString());
+
 
 		var result = Recognizer.Recognize(linePs, true);
 		console.log(result);
@@ -741,7 +756,7 @@ class linesScene {
 
 		setTimeout(function() {
 			That.musicLoop();
-		}, 300);
+		}, 200);
 	}
 
 

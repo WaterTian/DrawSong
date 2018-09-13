@@ -1,4 +1,6 @@
-precision highp float;
+#ifdef GL_ES
+precision mediump float;
+#endif
 
 uniform sampler2D map;
 uniform float opacity;
