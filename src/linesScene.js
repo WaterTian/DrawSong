@@ -92,8 +92,8 @@ class linesScene {
 		That = this;
 
 		// this.vconsole = new VConsole();
-		this.stats = new Stats();
-		document.body.appendChild(this.stats.dom);
+		// this.stats = new Stats();
+		// document.body.appendChild(this.stats.dom);
 
 		this.container = document.getElementById('webglContainer');
 		this.container.style.top = ctop + 'px';
@@ -113,7 +113,6 @@ class linesScene {
 
 			StartAudioContext(Tone.context, element, function() {
 				element.remove();
-
 				That.initUnit();
 			});
 		} else {
@@ -279,15 +278,15 @@ class linesScene {
 		// console.log(" beta "+beta+" gamma "+gamma);
 
 		let _rx = beta * 0.6;
-		let _ry = (-gamma) * 0.6;
-		// let _ry = (-gamma - Math.PI * 0.3) * 0.6;
+		let _rx_sp = (beta - Math.PI * 0.3) * 0.6;
 
-		if (event.gamma < 0) {
-			if (window.innerWidth > window.innerHeight) {
-				euler.set(_ry, _rx, 0, 'YXZ');
-			} else {
-				euler.set(_rx, _ry, 0, 'YXZ');
-			}
+		let _ry = (-gamma) * 0.6;
+		let _ry_hp = (-gamma - Math.PI * 0.3) * 0.6;
+
+		if (window.innerWidth > window.innerHeight) {
+			if (event.gamma < 0)euler.set(_ry_hp, _rx, 0, 'YXZ');
+		} else {
+			euler.set(_rx_sp, _ry, 0, 'YXZ');
 		}
 
 		q0.setFromEuler(euler);
@@ -661,7 +660,6 @@ class linesScene {
 			scale: 0.1,
 			ease: Back.easeOut,
 		});
-
 
 
 		let playBtn = document.getElementById('PlayBtn');

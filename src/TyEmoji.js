@@ -28,7 +28,7 @@ class TyEmoji extends THREE.Object3D {
 
 			That.eyeLTexs = [startTex[0]];
 			That.eyeL = new TyCard(startTex[0], That.eyeColor);
-			That.eyeL.scale.x = That.eyeL.scale.y = 0.1;
+			That.eyeL.scale.x = That.eyeL.scale.y = 0.12;
 			That.eyeL.position.x = -15;
 			That.eyeL.position.y = 15;
 			That.eyeL.renderOrder = 7;
@@ -36,7 +36,7 @@ class TyEmoji extends THREE.Object3D {
 
 			That.eyeRTexs = [startTex[1]];
 			That.eyeR = new TyCard(startTex[1], That.eyeColor);
-			That.eyeR.scale.x = That.eyeR.scale.y = 0.1;
+			That.eyeR.scale.x = That.eyeR.scale.y = 0.12;
 			That.eyeR.position.x = 15;
 			That.eyeR.position.y = 15;
 			That.eyeR.renderOrder = 7;
@@ -44,7 +44,7 @@ class TyEmoji extends THREE.Object3D {
 
 			That.mouthTexs = [startTex[2]];
 			That.mouth = new TyCard(startTex[2], That.eyeColor);
-			That.mouth.scale.x = That.mouth.scale.y = 0.15;
+			That.mouth.scale.x = That.mouth.scale.y = 0.2;
 			That.mouth.position.y = -15;
 			That.mouth.renderOrder = 7;
 

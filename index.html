@@ -22,7 +22,9 @@
             <div>o v s</div>
         </div>
     </div>
-    <div id="webglContainer"></div>
+
+    <div class="bg" id="bg"></div>
+    <div class="webglContainer" id="webglContainer"></div>
 
     <div id="UI">
         <div class="BtnContainer" id="BtnContainer">
@@ -57,6 +59,12 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.getElementById('bg').addEventListener('touchmove', function(e) {
+            e.preventDefault()
+        }, false);
+    </script>
     <script src="http://code.jquery.com/jquery-latest.js"></script>
     <script src="dist/app.js?v=0.0.1"></script>
 </body>

@@ -1,7 +1,6 @@
 #ifdef GL_ES
-precision mediump float;
+precision highp float;
 #endif
-
 
 uniform sampler2D map;
 uniform sampler2D alphaMap;
