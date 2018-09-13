@@ -450,7 +450,7 @@ class linesScene {
 	drawEnd() {
 		_isDown = false;
 		console.log("drawEnd");
-
+		
 		if (That.curLine.points.length == 0) return;
 
 		var linePs = [];
@@ -662,6 +662,10 @@ class linesScene {
 		undoBtn.addEventListener('click', this.undoMuisc);
 
 
+		let saveBtn = document.getElementById('SaveBtn');
+		saveBtn.addEventListener('touchmove', EventPreventDefault);
+		saveBtn.addEventListener('mousemove', EventPreventDefault);
+		saveBtn.addEventListener('click', this.saveMuisc);
 
 		function EventPreventDefault(event) {
 			event.preventDefault();
@@ -675,12 +679,16 @@ class linesScene {
 		document.getElementById('play').style.display = "block";
 		document.getElementById('pause').style.display = "none";
 
+		
 		if (That.lines.length < 1) return;
 		That.lines[That.lines.length - 1].removeThis(function(_that) {
 			That.linesObj.remove(_that);
+			That.lines.pop();
+			curPlayNum = 0;
 		});
-		That.lines.pop();
-		curPlayNum = 0;
+
+		
+
 	}
 
 	clearAllMuisc() {
@@ -711,9 +719,6 @@ class linesScene {
 			document.getElementById('play').style.display = "block";
 			document.getElementById('pause').style.display = "none";
 		}
-
-
-		That.saveLines();
 	}
 
 	musicLoop() {
@@ -737,11 +742,11 @@ class linesScene {
 
 		setTimeout(function() {
 			That.musicLoop();
-		}, 200);
+		}, 300);
 	}
 
 
-	saveLines() {
+	saveMuisc() {
 
 		let linesData = [];
 		That.lines.forEach(function(l) {
@@ -753,26 +758,22 @@ class linesScene {
 				"emoji": l.haveEmoji,
 				"points": []
 			}
-
 			l.points.forEach(function(p) {
 				lineData.points.push(p.x);
 				lineData.points.push(p.y);
 				lineData.points.push(p.z);
 			});
-
 			linesData.push(lineData);
 		});
 
 		let linesStr = JSON.stringify(linesData);
-
-
 
 		let sendData = {
 			'audios': That.tyAudio.names,
 			'lines': linesStr
 		}
 
-		// console.log(linesStr);
+		console.log(linesStr);
 		// tool.postJson('./saveJson.php', sendData).then(function(data) {
 		// 	console.log(data);
 		// });
