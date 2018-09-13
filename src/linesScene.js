@@ -11,7 +11,6 @@ import TyAudio from './TyAudio';
 import TyLine from './TyLine';
 import TyRecognizer from './TyRecognizer';
 import introObject from './introObject';
-
 import linesPlayer from './linesPlayer';
 
 
@@ -450,7 +449,7 @@ class linesScene {
 	drawEnd() {
 		_isDown = false;
 		console.log("drawEnd");
-		
+
 		if (That.curLine.points.length == 0) return;
 
 		var linePs = [];

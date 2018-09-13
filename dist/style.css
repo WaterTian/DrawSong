@@ -94,9 +94,9 @@
         background-size: 136px 136px;
         right: 0px;
         left: 0px;
-        bottom: 0px;
+        bottom: -18px;
         margin: auto;
-        /*transform: scale(.85);*/
+        transform: scale(.7);
         display: none;
     }
 
@@ -152,12 +152,11 @@
 
     .UndoBtn {
         position: absolute;
-        width: 50px;
-        height: 50px;
-        background-size: 50px 50px;
-        left: -40%;
-        top: 40%;
-        transform: scale(.75);
+        width: 68px;
+        height: 68px;
+        background-size: 68px 68px;
+        left: -50%;
+        top: 30%;
     }
 
     .UndoBtn .undo-icon {
@@ -165,21 +164,10 @@
         width: 100%;
         height: 100%;
         background-image: url(../assets/replay.png);
-        background-size: 80%;
+        background-size: 50%;
         background-repeat: no-repeat;
         background-position: center center;
         z-index: 2;
-    }
-
-    .UndoBtn .WobblyCircle {
-        position: absolute;
-        width: 65px;
-        height: 65px;
-        background-size: 65px 65px;
-        left: 50%;
-        top: 50%;
-        margin-left: -32.5px;
-        margin-top: -32.5px;
     }
 
     .UndoBtn .hit {
@@ -195,25 +183,13 @@
 
     .SaveBtn {
         position: absolute;
-        width: 50px;
-        height: 50px;
-        background-size: 50px 50px;
+        width: 68px;
+        height: 68px;
+        background-size: 68px 68px;
         left: 100%;
-        top: 40%;
-        transform: scale(.75);
+        top: 30%;
     }
 
-
-    .SaveBtn .WobblyCircle {
-        position: absolute;
-        width: 65px;
-        height: 65px;
-        background-size: 65px 65px;
-        left: 50%;
-        top: 50%;
-        margin-left: -32.5px;
-        margin-top: -32.5px;
-    }
 
     .SaveBtn .hit {
         width: 100%;

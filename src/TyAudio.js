@@ -111,7 +111,7 @@ class TyAudio {
 		let btnPath;
 		for (let i = 0; i < num; i += 2) {
 
-			let random = soundValue[i] * 10;
+			let random = soundValue[i] * 20;
 			if (i > num / 2) random = soundValue[num - i] * 10;
 
 			let x1 = (radius + random) * Math.cos(angle) + _size / 2;
@@ -129,6 +129,8 @@ class TyAudio {
 		}
 
 		document.getElementById('BtnPath').setAttribute("d", btnPath);
+		document.getElementById('BtnPath2').setAttribute("d", btnPath);
+		document.getElementById('BtnPath3').setAttribute("d", btnPath);
 
 
 		let soundPath;
