@@ -11,19 +11,20 @@ const tool = new Unit();
 let That;
 class linesPlayer {
 
-	constructor(_lines, _linesObj, callback) {
+	constructor(_idStr, _lines, _linesObj, callback) {
 		That = this;
 
 		this.lines = _lines;
 		this.linesObj = _linesObj;
 		this.callback = callback;
+		this.idStr = _idStr;
 
 		this.loadLines();
 
 	}
 
 	loadLines() {
-		tool.loadJson('./lines.json').then(function(json) {
+		tool.loadJson('./' + this.idStr + '.json').then(function(json) {
 			console.log(json);
 
 			That.initLines(json);
@@ -46,12 +47,11 @@ class linesPlayer {
 			That.linesObj.add(line);
 			That.lines.push(line);
 
-			let _ps = [];
 			for (let j = 0; j < l.points.length; j += 3) {
-				_ps.push(new THREE.Vector3(l.points[j], l.points[j + 1], l.points[j + 2]))
+				line.points.push(new THREE.Vector3(l.points[j], l.points[j + 1], l.points[j + 2]))
 			}
-			line.pointZ = _ps[_ps.length - 1].z;
-			line.setPoints(_ps);
+			line.pointZ = line.points[line.points.length - 1].z;
+			line.setPoints(line.points);
 			line.show(i * 0.3, () => {
 				if (l.emoji) line.addEmoji();
 			});

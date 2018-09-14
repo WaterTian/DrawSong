@@ -168,7 +168,7 @@ class linesScene {
 		That.initLine();
 		That.initUI();
 
-		That.player = new linesPlayer(That.lines, That.linesObj, (audios) => {
+		That.player = new linesPlayer(URL_id, That.lines, That.linesObj, (audios) => {
 			That.tyAudio = new TyAudio(audios);
 			That.reorderLinesWithZ();
 		});
@@ -284,7 +284,7 @@ class linesScene {
 		let _ry_hp = (-gamma - Math.PI * 0.3) * 0.6;
 
 		if (window.innerWidth > window.innerHeight) {
-			if (event.gamma < 0)euler.set(_ry_hp, _rx, 0, 'YXZ');
+			if (event.gamma < 0) euler.set(_ry_hp, _rx, 0, 'YXZ');
 		} else {
 			euler.set(_rx_sp, _ry, 0, 'YXZ');
 		}
@@ -464,7 +464,7 @@ class linesScene {
 		for (var i = 0; i < That.curLine.points.length; i += 3) {
 			linePs.push(That.curLine.points[i].x);
 			linePs.push(That.curLine.points[i].y);
-            //// 字母笔记采样
+			//// 字母笔记采样
 			// linePs.push(That.curLine.points[i].x.toFixed(2));
 			// linePs.push(That.curLine.points[i].y.toFixed(2));
 		}
@@ -691,7 +691,7 @@ class linesScene {
 		document.getElementById('play').style.display = "block";
 		document.getElementById('pause').style.display = "none";
 
-		
+
 		if (That.lines.length < 1) return;
 		That.lines[That.lines.length - 1].removeThis(function(_that) {
 			That.linesObj.remove(_that);
@@ -699,7 +699,7 @@ class linesScene {
 			curPlayNum = 0;
 		});
 
-		
+
 
 	}
 
@@ -778,17 +778,23 @@ class linesScene {
 			linesData.push(lineData);
 		});
 
-		let linesStr = JSON.stringify(linesData);
-
-		let sendData = {
+		let jsonData = {
 			'audios': That.tyAudio.names,
-			'lines': linesStr
+			'lines': linesData
 		}
 
-		console.log(linesStr);
-		// tool.postJson('./saveJson.php', sendData).then(function(data) {
-		// 	console.log(data);
-		// });
+		let sendData = {
+			'userName': "ty",
+			'jsonStr': JSON.stringify(jsonData)
+		}
+
+		console.log(sendData);
+		tool.postJson('./saveJson.php', sendData).then(function(data) {
+			console.log(data);
+			let idStr = data.idStr;
+			/////////
+			window.location.href = './?id=' + idStr;
+		});
 	}
 }
 
