@@ -792,6 +792,7 @@ class linesScene {
 		tool.postJson('./saveJson.php', sendData).then(function(data) {
 			console.log(data);
 			let idStr = data.idStr;
+			alert("保存成功！可以右上角分享哦～");
 			/////////
 			window.location.href = './?id=' + idStr;
 		});
