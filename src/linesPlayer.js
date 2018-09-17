@@ -39,6 +39,8 @@ class linesPlayer {
 	initLines(json) {
 
 		json.lines.forEach(function(l, i) {
+			if (l.points.length < 1) return;
+			
 			let line = new TyLine(l.lineColor, lineTexture, "parabolic");
 			line.detune = l.detune;
 			line.order = l.order;

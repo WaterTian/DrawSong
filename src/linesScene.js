@@ -762,6 +762,8 @@ class linesScene {
 
 		let linesData = [];
 		That.lines.forEach(function(l) {
+			if (l.points.length < 1) return;
+
 			let lineData = {
 				"lineColor": l.lineColor,
 				"detune": l.detune,
@@ -793,8 +795,12 @@ class linesScene {
 			console.log(data);
 			let idStr = data.idStr;
 			alert("保存成功！可以右上角分享哦～");
-			/////////
-			window.location.href = './?id=' + idStr;
+
+			setTimeout(function() {
+				/////////
+				window.location.href = './?id=' + idStr;
+			}, 1000);
+
 		});
 	}
 }
