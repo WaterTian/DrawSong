@@ -15,19 +15,19 @@ class fireworks extends THREE.Object3D {
 
 
 		// geometry
-		var vector = new THREE.Vector4();
-		var triangles = 1;
-		var instances = 3000;
-		var positions = [];
-		var offsets = [];
-		var colors = [];
-		var orientationsStart = [];
-		var orientationsEnd = [];
+		let vector = new THREE.Vector4();
+		let triangles = 1;
+		let instances = 3000;
+		let positions = [];
+		let offsets = [];
+		let colors = [];
+		let orientationsStart = [];
+		let orientationsEnd = [];
 		positions.push(0.25, -0.25, 0);
 		positions.push(-0.25, 0.25, 0);
 		positions.push(0, 0, 0.25);
 		// instanced attributes
-		for (var i = 0; i < instances; i++) {
+		for (let i = 0; i < instances; i++) {
 			// offsets
 			offsets.push(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5);
 			// colors
@@ -41,7 +41,7 @@ class fireworks extends THREE.Object3D {
 			vector.normalize();
 			orientationsEnd.push(vector.x, vector.y, vector.z, vector.w);
 		}
-		var geometry = new THREE.InstancedBufferGeometry();
+		let geometry = new THREE.InstancedBufferGeometry();
 		geometry.maxInstancedCount = instances; // set so its initalized for dat.GUI, will be set in first draw otherwise
 		geometry.addAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
 		geometry.addAttribute('offset', new THREE.InstancedBufferAttribute(new Float32Array(offsets), 3));
