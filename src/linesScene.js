@@ -113,22 +113,28 @@ class linesScene {
 
 			StartAudioContext(Tone.context, element, function() {
 				element.remove();
-				That.initUnit();
+				if (URL_id) That.initPlayer();
+				else That.initUnit();
 			});
 		} else {
 
-			That.initUnit();
+			if (URL_id) That.initPlayer();
+			else That.initUnit();
 		}
 	}
 
 
 	initUnit() {
+		let unit = document.querySelector(".unit");
+		unit.style.display = "block";
+		TweenMax.from(unit, .8, {
+			opacity: 0,
+			scale: 0.1,
+			ease: Back.easeOut,
+		});
 
-		if (URL_id) {
-			That.initPlayer();
-			document.querySelector(".unit").style.display = "none";
-			return;
-		}
+		if (That.unitInited) return; /// 避免重复创建监听
+		That.unitInited = true;
 
 
 		let btn1 = document.getElementById('unitBtn1');
@@ -311,10 +317,11 @@ class linesScene {
 		That.intro.RecognizerNums = _rNs;
 
 
-		That.initLine();
-		/////////////////////////////////// skip
-		That.initIntro1();
-		// That.removeIntro();
+		if (!That.linesObj) That.initLine(); ////避免重复创建
+
+		//////////////////////////////////////////////   skip
+		// That.initIntro1();
+		That.removeIntro();
 	}
 
 	initIntro1() {
@@ -649,17 +656,46 @@ class linesScene {
 	}
 
 
+	backUnit() {
+		console.log("backUnit");
+		That.clearAllMuisc();
+		That.removeUI();
+		That.initUnit();
+
+	}
+
+
 	/////////// UI Bar
 	///
 	initUI() {
 
 		let BtnContainer = document.getElementById('BtnContainer');
 		BtnContainer.style.display = "block";
-		TweenMax.from(BtnContainer, .8, {
+		TweenMax.to(BtnContainer, 0, {
 			opacity: 0,
-			scale: 0.1,
+			scale: 0
+		});
+		TweenMax.to(BtnContainer, .8, {
+			opacity: 1,
+			scale: .7,
 			ease: Back.easeOut,
 		});
+
+
+		let BackBtn = document.getElementById('BackBtn');
+		BackBtn.style.display = "block";
+		TweenMax.to(BackBtn, 0, {
+			opacity: 0,
+			scale: 0
+		});
+		TweenMax.to(BackBtn, .8, {
+			opacity: 1,
+			scale: 0.85,
+			ease: Back.easeOut,
+		});
+		BackBtn.addEventListener('touchmove', EventPreventDefault);
+		BackBtn.addEventListener('mousemove', EventPreventDefault);
+		BackBtn.addEventListener('click', this.backUnit);
 
 
 		let playBtn = document.getElementById('PlayBtn');
@@ -679,9 +715,15 @@ class linesScene {
 		saveBtn.addEventListener('mousemove', EventPreventDefault);
 		saveBtn.addEventListener('click', this.saveMuisc);
 
+
 		function EventPreventDefault(event) {
 			event.preventDefault();
 		}
+	}
+	removeUI() {
+		document.getElementById('BtnContainer').style.display = "none";
+		document.getElementById('BackBtn').style.display = "none";
+
 	}
 
 	undoMuisc() {

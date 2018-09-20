@@ -48,6 +48,7 @@
         opacity: 1;
         text-align: center;
         top: 50%;
+        display: none;
     }
 
     .unit .button {
@@ -89,6 +90,60 @@
         -o-transition: all 0.1s ease-out;
         transition: all 0.1s ease-out;
     }
+
+
+    /*
+    backBtn
+     */
+    .back {
+        position: absolute;
+        opacity: 1;
+        top: 12px;
+        right: 10px;
+        display: none;
+    }
+
+    .back .button {
+        color: #666;
+        cursor: pointer;
+        border: 4px solid #ccc;
+        background-color: #fff;
+        display: inline-block;
+        padding: 6px 20px 6px 20px;
+        
+        font-family: 'proxima-nova', sans-serif;
+        font-size: 16px;
+
+        -o-transform: scale(0.85, 0.85);
+        -ms-transform: scale(0.85, 0.85);
+        -moz-transform: scale(0.85, 0.85);
+        -webkit-transform: scale(0.85, 0.85);
+        transform: scale(0.85, 0.85);
+
+        -webkit-transition: all 0.1s ease-out;
+        -moz-transition: all 0.1s ease-out;
+        -ms-transition: all 0.1s ease-out;
+        -o-transition: all 0.1s ease-out;
+        transition: all 0.1s ease-out;
+    }
+    .back .button:hover {
+        opacity: 1;
+        -o-transform: scale(1, 1);
+        -ms-transform: scale(1, 1);
+        -moz-transform: scale(1, 1);
+        -webkit-transform: scale(1, 1);
+        transform: scale(1, 1);
+        -webkit-transition: all 0.1s ease-out;
+        -moz-transition: all 0.1s ease-out;
+        -ms-transition: all 0.1s ease-out;
+        -o-transition: all 0.1s ease-out;
+        transition: all 0.1s ease-out;
+    }
+
+
+
+
+
     /*
 * 
 * PLAY BTN
@@ -211,6 +266,25 @@
     }
 
 
+
+
+
+    .BackBtn {
+        position: absolute;
+        z-index: 9;
+        width: 100%;
+        opacity: 1;
+        text-align: center;
+
+        color: #666;
+        cursor: pointer;
+        border: 4px solid #ccc;
+        display: inline-block;
+        padding: 15px 24px 15px 24px;
+        
+        font-family: 'proxima-nova', sans-serif;
+        font-size: 24px;
+    }
 
 
     /*
