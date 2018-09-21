@@ -320,8 +320,8 @@ class linesScene {
 		if (!That.linesObj) That.initLine(); ////避免重复创建
 
 		//////////////////////////////////////////////   skip
-		// That.initIntro1();
-		That.removeIntro();
+		That.initIntro1();
+		// That.removeIntro();
 	}
 
 	initIntro1() {
