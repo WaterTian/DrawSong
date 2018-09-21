@@ -625,8 +625,8 @@ class linesScene {
 
 
 		////test
-		// if (That.linesObj) That.linesObj.rotation.y = Math.sin(time * 0.001) * 0.3;
-		// if (That.raycasterPlane) That.raycasterPlane.rotation.y = Math.sin(time * 0.001) * 0.3;
+		// if (That.linesObj) That.linesObj.rotation.y = Math.sin(time * 0.001) * 0.25;
+		// if (That.raycasterPlane) That.raycasterPlane.rotation.y = Math.sin(time * 0.001) * 0.25;
 
 	}
 
