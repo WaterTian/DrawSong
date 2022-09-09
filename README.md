@@ -1,6 +1,8 @@
 # 画儿歌
 
 
+项目在线预览地址： https://watertian.github.io/DrawSong/
+
 ## Installation
 
 Install dependencies with:
